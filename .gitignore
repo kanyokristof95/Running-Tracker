@@ -1,2 +1,5 @@
-**/an_ignored_folder/
-file.ignored
+**/.vs/
+**/bin/
+**/obj/
+**/packages/
+**/ApiKeys.xml
