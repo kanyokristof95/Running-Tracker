@@ -9,6 +9,7 @@ using System;
 using System.Threading.Tasks;
 using System.Text;
 using Android.Runtime;
+using Android.Views;
 
 namespace DeviceLocationWithoutAddress
 {
@@ -58,6 +59,10 @@ namespace DeviceLocationWithoutAddress
             base.OnCreate(savedInstanceState);
             SetContentView(Resource.Layout.Main);
 
+            // Letiltja az alvó módot
+            this.Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
+
+
             _LongitudeText = FindViewById<TextView>(Resource.Id.LongitudeText);
             _LatitudeText = FindViewById<TextView>(Resource.Id.LatitudeText);
             
@@ -87,6 +92,10 @@ namespace DeviceLocationWithoutAddress
         {
             base.OnResume();
             _locationManager.RequestLocationUpdates(_locationProvider, 0, 0, this); // Beállítja, hogy a helyzet megváltoztatása esetén küldjön jelet
+
+            // csak 1 szignál küldése
+            //_locationManager.RequestSingleUpdate(_locationProvider, this, null);
+
         }
 
         protected override void OnPause()
