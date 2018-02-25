@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:paddingTop="20dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp">
+    <TextView
+        android:layout_width="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_height="wrap_content"
+        android:text="Latitude:"
+        android:layout_marginBottom="15dp"
+        android:textColor="@android:color/white" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_height="wrap_content"
+        android:text="Loading ..."
+        android:id="@+id/LatitudeText"
+        android:layout_marginBottom="40dp" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_height="wrap_content"
+        android:text="Longitude:"
+        android:layout_marginBottom="15dp"
+        android:textColor="@android:color/white" />
+    <TextView
+        android:layout_width="fill_parent"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:layout_height="wrap_content"
+        android:text="Loading ..."
+        android:id="@+id/LongitudeText"
+        android:layout_marginBottom="15dp" />
+</LinearLayout>
