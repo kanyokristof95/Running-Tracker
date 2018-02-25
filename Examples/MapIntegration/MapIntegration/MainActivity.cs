@@ -34,7 +34,7 @@ namespace MapIntegration
 
             _map.MoveCamera(cameraUpdate);
 
-            PolylineOptions rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+            /*PolylineOptions rectOptions = new PolylineOptions().InvokeColor(Color.Red);
             
             rectOptions.Add(new LatLng(37.785559, -122.396728));
             rectOptions.Add(new LatLng(37.780624, -122.390541));
@@ -42,7 +42,7 @@ namespace MapIntegration
             rectOptions.Add(new LatLng(37.776831, -122.394627));
             rectOptions.Add(new LatLng(37.776831, -122.404627));
 
-            _map.AddPolyline(rectOptions);
+            _map.AddPolyline(rectOptions);*/
         }
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -86,15 +86,27 @@ namespace MapIntegration
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
         {
-            if (_map != null && i + 1 < lines.Count)
+            if (_map != null && i < lines.Count)
             {
                 RunOnUiThread(() =>
                 {
-                    rectOptions = new PolylineOptions().InvokeColor(Color.Red);
-                    rectOptions.Add(lines[i]);
-                    rectOptions.Add(lines[i + 1]);
-                    i++;
-                    _map.AddPolyline(rectOptions); // Az i. és az i+1. közötti szakasz kirajzolása
+                    // Ebben az esetben a szakaszokat egymástól függetlenül rajzolja le, amelynek hatására kevésbé lesz szép
+                        /*rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+                        rectOptions.Add(lines[i]);
+                        rectOptions.Add(lines[i + 1]);
+                        i++;
+                        _map.AddPolyline(rectOptions); // Az i. és az i+1. közötti szakasz kirajzolása*/
+
+                    // Ebben az esetben a pontokat összekötő egyeneseket egyben kezeli, amely hatására szebb lesz a kirajzolása
+                        _map.Clear();
+                        rectOptions.Add(lines[i]);
+                        i++;
+                        if(i == 1)
+                        {
+                            rectOptions.Add(lines[i]);
+                            i++;
+                        }
+                        _map.AddPolyline(rectOptions);
                 });
             }
             else
