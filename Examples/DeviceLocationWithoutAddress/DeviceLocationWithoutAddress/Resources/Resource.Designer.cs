@@ -44,11 +44,26 @@ namespace DeviceLocationWithoutAddress
 		public partial class Id
 		{
 			
-			// aapt resource value: 0x7f040000
-			public const int LatitudeText = 2130968576;
+			// aapt resource value: 0x7f040006
+			public const int AccuracyText = 2130968582;
+			
+			// aapt resource value: 0x7f040004
+			public const int AltitudeText = 2130968580;
 			
 			// aapt resource value: 0x7f040001
-			public const int LongitudeText = 2130968577;
+			public const int DistanceText = 2130968577;
+			
+			// aapt resource value: 0x7f040002
+			public const int LatitudeText = 2130968578;
+			
+			// aapt resource value: 0x7f040003
+			public const int LongitudeText = 2130968579;
+			
+			// aapt resource value: 0x7f040005
+			public const int ProviderText = 2130968581;
+			
+			// aapt resource value: 0x7f040000
+			public const int SpeedText = 2130968576;
 			
 			static Id()
 			{
