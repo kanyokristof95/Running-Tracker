@@ -1,0 +1,12 @@
+﻿<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:myapp="http://schemas.android.com/apk/res-auto">
+  <item android:id="@+id/undo"
+        android:icon="@drawable/undo"
+        android:title="Undo"
+        myapp:showAsAction="always"/>
+
+  <item android:id="@+id/delete"
+        android:icon="@drawable/delete"
+        android:title="Delete"
+        myapp:showAsAction="always"/>
+</menu>
