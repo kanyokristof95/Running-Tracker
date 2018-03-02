@@ -69,6 +69,7 @@ namespace MapIntegration
             }
 
             rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+
             lines = new List<LatLng>();
             lines.Add(new LatLng(37.785559, -122.396728)); // 0
             lines.Add(new LatLng(37.780624, -122.390541)); // 1
