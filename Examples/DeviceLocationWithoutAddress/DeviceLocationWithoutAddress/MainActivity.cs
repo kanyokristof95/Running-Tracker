@@ -39,7 +39,7 @@ namespace DeviceLocationWithoutAddress
 
             _AccuracyText.Text = Math.Round(_currentLocation.Accuracy, 2).ToString();
 
-            if (_currentLocation.Accuracy > 5)
+            if (_currentLocation.Accuracy > 6)
                 return;
 
             if (_currentLocation == null)
@@ -143,7 +143,7 @@ namespace DeviceLocationWithoutAddress
             base.OnResume();
 
             // Csak akkor küld jelet, ha eltelt 1 mp és legalább 0 métert megtett
-            _locationManager.RequestLocationUpdates(_locationProvider, 1000, 0, this);
+            _locationManager.RequestLocationUpdates(_locationProvider, 3000, 0, this);
 
             // csak 1 szignál küldése
             //_locationManager.RequestSingleUpdate(_locationProvider, this, null);
