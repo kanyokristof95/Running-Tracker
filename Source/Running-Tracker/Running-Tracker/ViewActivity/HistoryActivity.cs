@@ -11,10 +11,10 @@ using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 
-namespace Running_Tracker
+namespace Running_Tracker.ViewActivity
 {
     [Activity(Label = "HistoryActivity", Theme = "@style/MyTheme")]
-    public class HistoryActivity : AppCompatActivity
+    public class HistoryActivity : BaseActivity
     {
         private List<string> mItems;
         ArrayAdapter<string> adapter;
@@ -32,10 +32,12 @@ namespace Running_Tracker
 
             //Listview beállítása
             ListView mListVIew = FindViewById<ListView>(Resource.Id.myListView);
-            mItems = new List<string>();
-            mItems.Add("First");
-            mItems.Add("Second");
-            mItems.Add("Third");
+            mItems = new List<string>
+            {
+                "First",
+                "Second",
+                "Third"
+            };
 
             adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, mItems);
             mListVIew.Adapter = adapter;

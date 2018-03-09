@@ -1,14 +1,20 @@
-﻿using Android.App;
-using Android.Widget;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+
+using Android.App;
+using Android.Content;
 using Android.OS;
+using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Views;
-using Android.Content;
+using Android.Widget;
 
-namespace Running_Tracker
+namespace Running_Tracker.ViewActivity
 {
-    [Activity(Label = "Running_Tracker", MainLauncher = true, Theme = "@style/MyTheme")]
-    public class MainActivity : AppCompatActivity
+    [Activity(Label = "OldRunningActivity", Theme = "@style/MyTheme")]
+    public class OldRunningActivity : BaseActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -18,37 +24,32 @@ namespace Running_Tracker
 
             Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
-            SupportActionBar.Title = "Running Tracker";
+            SupportActionBar.Title = "Run details";
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
-            MenuInflater.Inflate(Resource.Menu.main_menu, menu);
+            MenuInflater.Inflate(Resource.Menu.old_running_menu, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            Intent intent = null;
             switch (item.ItemId)
             {
-                case Resource.Id.history:
-                    intent = new Intent(this, typeof(HistoryActivity));
+                case Resource.Id.undo:
+                    base.OnBackPressed();
                     break;
-                case Resource.Id.settings:
-                    intent = new Intent(this, typeof(SettingsActivity));
+                case Resource.Id.delete:
+                    //TODO felugróablak megerősítést kér a törlésről, majd megerősítés esetén a törlés elvégzése
+                    base.OnBackPressed();
                     break;
                 default:
                     break;
             }
 
-            if (intent != null)
-            {
-                StartActivity(intent);
-            }
-
             return base.OnOptionsItemSelected(item);
         }
+
     }
 }
-

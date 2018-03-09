@@ -7,10 +7,10 @@ using Android.Views;
 using Android.Widget;
 using System;
 
-namespace Running_Tracker
+namespace Running_Tracker.ViewActivity
 {
     [Activity(Label = "SettingsActivity", Theme = "@style/MyTheme")]
-    public class SettingsActivity : AppCompatActivity
+    public class SettingsActivity : BaseActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
         {
