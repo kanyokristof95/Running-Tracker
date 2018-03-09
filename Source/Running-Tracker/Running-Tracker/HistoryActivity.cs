@@ -72,16 +72,9 @@ namespace Running_Tracker
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            Intent intent = null;
-
             if (item.ItemId == Resource.Id.undo)
             {
-                intent = new Intent(this, typeof(MainActivity));
-            }
-
-            if (intent != null)
-            {
-                StartActivity(intent);
+                base.OnBackPressed();
             }
 
             return base.OnOptionsItemSelected(item);

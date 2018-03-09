@@ -49,10 +49,6 @@ namespace Running_Tracker
 
             return base.OnOptionsItemSelected(item);
         }
-
-
-
-
     }
 }
 

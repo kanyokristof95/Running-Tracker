@@ -35,23 +35,17 @@ namespace Running_Tracker
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            Intent intent = null;
             switch (item.ItemId)
             {
                 case Resource.Id.undo:
-                    intent = new Intent(this, typeof(MainActivity));
+                    base.OnBackPressed();
                     break;
                 case Resource.Id.delete:
                     //TODO felugróablak megerősítést kér a törlésről, majd megerősítés esetén a törlés elvégzése
-                    intent = new Intent(this, typeof(HistoryActivity));
+                    base.OnBackPressed();
                     break;
                 default:
                     break;
-            }
-
-            if (intent != null)
-            {
-                StartActivity(intent);
             }
 
             return base.OnOptionsItemSelected(item);
