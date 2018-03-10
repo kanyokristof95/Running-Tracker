@@ -14,12 +14,21 @@ namespace Running_Tracker.Persistence
 {
     public class WarningValues
     {
-        int Distance { get; set; }
+        /// <summary>
+        /// In meter
+        /// </summary>
+        public double Distance { get; set; }
 
-        int Time { get; set; }
+        public TimeSpan Time { get; set; }
 
-        int MinimumSpeed { get; set; }
+        /// <summary>
+        /// In km/h
+        /// </summary>
+        public double MinimumSpeed { get; set; }
 
-        int MaximumSpeed { get; set; }
+        /// <summary>
+        /// In km/h
+        /// </summary>
+        public double MaximumSpeed { get; set; }
     }
 }

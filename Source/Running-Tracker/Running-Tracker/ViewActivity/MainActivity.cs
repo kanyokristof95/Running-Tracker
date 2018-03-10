@@ -55,7 +55,7 @@ namespace Running_Tracker.ViewActivity
                 }
                 
                 locationManager.RequestLocationUpdates(locationProvider, model.GPSMinTime, model.GPSMinDistance, this);
-                model.calibrate();
+                model.Calibrate();
             }
         }
 
@@ -99,7 +99,7 @@ namespace Running_Tracker.ViewActivity
         
         public void OnLocationChanged(Location location)
         {
-            model.changeLocation(location);
+            model.ChangeLocation(location);
         }
 
         public void OnProviderDisabled(string provider)
@@ -138,7 +138,6 @@ namespace Running_Tracker.ViewActivity
         {
             base.OnPause();
             locationManager.RemoveUpdates(this);
-            ;
         }
 
         public override bool OnCreateOptionsMenu(IMenu menu)

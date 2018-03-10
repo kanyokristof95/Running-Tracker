@@ -96,10 +96,10 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Model\GPS_Status.cs" />
     <Compile Include="Model\PositionArgs.cs" />
+    <Compile Include="Model\WarningArgs.cs" />
+    <Compile Include="Model\WarningType.cs" />
     <Compile Include="Persistence\Gender.cs" />
-    <Compile Include="Persistence\MovementType.cs" />
     <Compile Include="Persistence\PersonalDatas.cs" />
     <Compile Include="Persistence\WarningValues.cs" />
     <Compile Include="ViewActivity\BaseActivity.cs" />
