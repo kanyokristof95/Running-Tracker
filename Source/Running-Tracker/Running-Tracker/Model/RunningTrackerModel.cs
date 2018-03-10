@@ -19,6 +19,18 @@ namespace Running_Tracker.Model
 
         #endregion
 
+        #region Properties
+        public int GPSMinTime
+        {
+            get { return 3; }
+        }
+        public int GPSMinDistance
+        {
+            get { return 0; }
+        }
+
+        #endregion
+
         #region Constructor
 
         public RunningTrackerModel(IRunningTrackerDataAccess runningTrackerDataAccess = null)
@@ -33,6 +45,11 @@ namespace Running_Tracker.Model
         #region Public Methods
 
         public void changeLocation(Location location)
+        {
+            throw new NotImplementedException();
+        }
+
+        public void calibrate()
         {
             throw new NotImplementedException();
         }
