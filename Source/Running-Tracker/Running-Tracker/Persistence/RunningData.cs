@@ -1,14 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-using Android.App;
-using Android.Content;
-using Android.OS;
-using Android.Runtime;
-using Android.Views;
-using Android.Widget;
 
 namespace Running_Tracker.Persistence
 {
@@ -23,6 +14,11 @@ namespace Running_Tracker.Persistence
         private double maxLongitude;
         private double minLatitude;
         private double maxLatitude;
+
+        public List<LocationData> Locations
+        {
+            get { return locationList; }
+        }
 
         /// <summary>
         /// In meter

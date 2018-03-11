@@ -1,12 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using Android.App;
-using Android.Content;
-using Android.Locations;
-using Android.OS;
-using Android.Runtime;
-using Android.Widget;
+﻿using Android.Locations;
 using Running_Tracker.Persistence;
+using System;
+using System.Collections.Generic;
 
 namespace Running_Tracker.Model
 {
@@ -146,6 +141,14 @@ namespace Running_Tracker.Model
                 runningData.Finish();
                 SaveRunning(runningData);
                 runningData = null;
+            }
+        }
+
+        public List<LocationData> Locations
+        {
+            get
+            {
+                return runningData.Locations;
             }
         }
 
