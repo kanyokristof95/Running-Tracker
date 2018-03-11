@@ -169,6 +169,9 @@
     <AndroidResource Include="Resources\menu\old_running_menu.xml" />
   </ItemGroup>
   <ItemGroup>
+    <AndroidResource Include="Resources\values\ApiKeys.xml">
+      <SubType>Designer</SubType>
+    </AndroidResource>
     <Content Include="THIRD-PARTY-NOTICES.txt" />
   </ItemGroup>
   <Import Project="$(MSBuildExtensionsPath)\Xamarin\Android\Xamarin.Android.CSharp.targets" />

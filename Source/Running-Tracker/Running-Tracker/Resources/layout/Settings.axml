@@ -25,9 +25,11 @@
             android:orientation="vertical"
             android:id="@+id/mainLayout">
         <!-- Elrejti a kezdetleges auto focus-t -->
-        <LinearLayout android:focusable="true"
-            android:focusableInTouchMode="true" android:layout_width="0px"
-            android:layout_height="0px" />
+            <LinearLayout
+                android:focusable="true"
+                android:focusableInTouchMode="true"
+                android:layout_width="0px"
+                android:layout_height="0px" />
         <!-- Personal datas -->
             <TextView
                 android:text="Personal datas"
