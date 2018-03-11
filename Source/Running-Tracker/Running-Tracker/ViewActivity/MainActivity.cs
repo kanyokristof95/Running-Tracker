@@ -1,18 +1,14 @@
 ﻿using Android.App;
 using Android.Widget;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Content;
 using Android.Locations;
 using Android.Runtime;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
-using Android.Graphics;
 using System;
-using System.Collections.Generic;
 using System.Timers;
-using System;
 
 namespace Running_Tracker.ViewActivity
 {

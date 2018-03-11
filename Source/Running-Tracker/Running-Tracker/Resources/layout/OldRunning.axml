@@ -16,6 +16,7 @@
     <TextView
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
+        android:paddingTop="10dp"
         android:id="@+id/txtTimer"
         android:text="00:00:00"
         android:textAppearance="?android:attr/textAppearanceLarge"
@@ -40,6 +41,7 @@
             android:paddingRight="10dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_weight="0.5"
             android:layout_height="wrap_content"
@@ -51,6 +53,7 @@
             android:paddingRight="10dp"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_weight="0.5"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
@@ -69,6 +72,8 @@
         <TextView
             android:gravity="center"
             android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:text="Distance (m)"
@@ -79,6 +84,8 @@
         <TextView
             android:gravity="center"
             android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_weight="0.5"
@@ -104,6 +111,7 @@
             android:layout_weight="0.33"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/up" />
@@ -115,6 +123,7 @@
             android:layout_weight="0.33"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/down" />
@@ -126,6 +135,7 @@
             android:layout_weight="0.34"
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:id="@+id/calorie" />
@@ -142,6 +152,8 @@
         <TextView
             android:gravity="center"
             android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_weight="0.33"
@@ -152,6 +164,8 @@
         <TextView
             android:gravity="center"
             android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_weight="0.33"
@@ -162,6 +176,8 @@
         <TextView
             android:gravity="center"
             android:textAlignment="center"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_weight="0.34"
@@ -172,6 +188,7 @@
     </LinearLayout>
     <FrameLayout
         android:id="@+id/map"
+        android:paddingTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 </LinearLayout>

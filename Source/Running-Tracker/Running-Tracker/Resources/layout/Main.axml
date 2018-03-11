@@ -17,11 +17,11 @@
         android:id="@+id/txtTimer"
         android:text="00:00:00"
         android:textAppearance="?android:attr/textAppearanceLarge"
-        android:textSize="25dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
-        android:gravity="center_horizontal" />
+        android:gravity="center_horizontal"
+        android:layout_marginTop="10dp" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -33,6 +33,7 @@
         <TextView
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:id="@+id/distance"
@@ -44,6 +45,7 @@
         <TextView
             android:text="0"
             android:textAppearance="?android:attr/textAppearanceMedium"
+            android:textColor="@android:color/black"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
             android:paddingLeft="10dp"
@@ -60,7 +62,9 @@
         android:paddingRight="10dp"
         android:orientation="horizontal">
         <TextView
-            android:text="Distance (km)"
+            android:text="Distance (m)"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:id="@+id/distanceText"
             android:layout_height="match_parent"
             android:layout_weight="0.5"
@@ -72,6 +76,8 @@
         <TextView
             android:text="Speed (km/h)"
             android:id="@+id/speedText"
+            android:textAppearance="?android:attr/textAppearanceSmall"
+            android:textColor="@android:color/black"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
             android:layout_height="wrap_content"
@@ -83,11 +89,14 @@
     <FrameLayout
         android:id="@+id/map"
         android:layout_width="match_parent"
-        android:layout_height="350.0dp"
-        android:layout_marginTop="14.5dp" />
+        android:layout_height="0dip"
+        android:layout_weight="1"
+        android:layout_marginTop="10dp" />
     <Button
         android:text="Button"
         android:id="@+id/mainButton"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:background="?attr/colorPrimary"
+        android:textColor="@android:color/white" />
 </LinearLayout>
