@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Locations;
@@ -181,6 +182,11 @@ namespace Running_Tracker.Model
         #endregion
 
         #region Persistence Methods
+        
+        public List<RunningData> LoadPreviousRunnings()
+        {
+            return runningTrackerDataAccess.LoadPreviousRunnings();
+        }
 
         public void SaveRunning(RunningData running)
         {

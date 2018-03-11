@@ -166,5 +166,10 @@ namespace Running_Tracker.Persistence
                 open = false;
             }
         }
+
+        public override string ToString()
+        {
+            return StartDateTime.ToString("yyyy. MM. dd. HH:mm:ss");
+        }
     }
 }
