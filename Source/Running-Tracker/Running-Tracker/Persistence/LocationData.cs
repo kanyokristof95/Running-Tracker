@@ -30,7 +30,7 @@ namespace Running_Tracker.Persistence
         /// </summary>
         public double Down { get; private set; }
         
-        public LocationData(Location location, double distance, double up, double down) : base(location)
+        public LocationData(Location location, double distance = 0, double up = 0, double down = 0) : base(location)
         {
             Distance = distance;
             Up = up;

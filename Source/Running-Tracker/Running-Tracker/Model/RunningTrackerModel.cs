@@ -27,7 +27,7 @@ namespace Running_Tracker.Model
 
         public int GPSMinTime
         {
-            get { return 3; }
+            get { return 1000; }
         }
 
         public int GPSMinDistance
@@ -62,8 +62,6 @@ namespace Running_Tracker.Model
 
         public void ChangeLocation(Location location)
         {
-            if (runningData == null) return;
-
             if(remaningCalibratingLocation > 0)
             {
                 // Calibrating
@@ -71,10 +69,13 @@ namespace Running_Tracker.Model
                     remaningCalibratingLocation--;
 
                 if (remaningCalibratingLocation == 0)
-                    OnGPS_Ready();
+                    OnGPS_Ready(new LocationData(location));
             } else
             {
                 // Working
+
+                if (runningData == null) return;
+
                 if (location.Accuracy <= DefaultGpsAccuracy)
                 {
                     previousLocation = currentLocation;
@@ -139,16 +140,19 @@ namespace Running_Tracker.Model
 
         public void StopRunning()
         {
-            runningData.Finish();
-            SaveRunning(runningData);
-            runningData = null;
+            if(runningData != null)
+            {
+                runningData.Finish();
+                SaveRunning(runningData);
+                runningData = null;
+            }
         }
 
         #endregion
 
         #region Events
 
-        public event EventHandler GPS_Ready;
+        public event EventHandler<PositionArgs> GPS_Ready;
         public event EventHandler GPS_NotReady;
 
         public event EventHandler<PositionArgs> NewPosition;
@@ -169,9 +173,9 @@ namespace Running_Tracker.Model
             GPS_NotReady?.Invoke(this, EventArgs.Empty);
         }
 
-        private void OnGPS_Ready()
+        private void OnGPS_Ready(LocationData location)
         {
-            GPS_Ready?.Invoke(this, EventArgs.Empty);
+            GPS_Ready?.Invoke(this, new PositionArgs(location));
         }
 
         #endregion

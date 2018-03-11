@@ -19,6 +19,11 @@ namespace Running_Tracker.Persistence
         private bool open;
         private double distance;
 
+        private double minLongitude;
+        private double maxLongitude;
+        private double minLatitude;
+        private double maxLatitude;
+
         /// <summary>
         /// In meter
         /// </summary>
@@ -97,10 +102,35 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        public double MinLongitude
+        {
+            get { return minLongitude; }
+        }
+
+        public double MaxLongitude
+        {
+            get { return maxLongitude; }
+        }
+
+        public double MinLatitude
+        {
+            get { return minLatitude; }
+        }
+
+        public double MaxLatitude
+        {
+            get { return maxLatitude; }
+        }
+
         public RunningData(PersonalDatas personalDatas)
         {
             open = true;
             distance = 0;
+
+            minLongitude = double.PositiveInfinity;
+            maxLongitude = double.NegativeInfinity;
+            minLatitude = double.PositiveInfinity;
+            maxLatitude = double.NegativeInfinity;
 
             this.personalDatas = personalDatas;
             locationList = new List<LocationData>();
@@ -111,6 +141,18 @@ namespace Running_Tracker.Persistence
         {
             if (open)
             {
+                if (location.Longitude < minLongitude)
+                    minLongitude = location.Longitude;
+
+                if (location.Longitude > maxLongitude)
+                    maxLongitude = location.Longitude;
+
+                if (location.Latitude < minLatitude)
+                    minLatitude = location.Latitude;
+
+                if (location.Latitude > maxLatitude)
+                    maxLatitude = location.Latitude;
+
                 distance += location.Distance;
                 locationList.Add(location);
             }
