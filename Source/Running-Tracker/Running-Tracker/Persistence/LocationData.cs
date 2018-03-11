@@ -15,11 +15,26 @@ namespace Running_Tracker.Persistence
 {
     public class LocationData : Location
     {
-        public MovementType Movement { get; set; }
+        /// <summary>
+        /// In meter
+        /// </summary>
+        public double Distance { get; private set; }
 
-        public LocationData(Location location) : base(location)
+        /// <summary>
+        /// In meter
+        /// </summary>
+        public double Up { get; private set; }
+
+        /// <summary>
+        /// In meter
+        /// </summary>
+        public double Down { get; private set; }
+        
+        public LocationData(Location location, double distance, double up, double down) : base(location)
         {
-            Movement = MovementType.Unknown;
+            Distance = distance;
+            Up = up;
+            Down = down;
         }
     }
 }

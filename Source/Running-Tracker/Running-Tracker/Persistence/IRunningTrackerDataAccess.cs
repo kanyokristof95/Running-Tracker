@@ -14,11 +14,11 @@ namespace Running_Tracker.Persistence
 {
     public interface IRunningTrackerDataAccess
     {
-        List<RunningData> loadPreviousRunnings();
+        List<RunningData> LoadPreviousRunnings();
 
-        void saveRunning(RunningData running);
+        void SaveRunning(RunningData running);
 
-        void deleteRunning(RunningData running);
+        void DeleteRunning(RunningData running);
 
         PersonalDatas CurrentPersonalDatas { get; set; }
 

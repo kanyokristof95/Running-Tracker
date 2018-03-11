@@ -15,7 +15,35 @@ namespace Running_Tracker.Model
 
         private IRunningTrackerDataAccess runningTrackerDataAccess;
         private RunningData runningData;
-        private GPS_Status gps_Status;
+        
+        private int remaningCalibratingLocation;
+
+        private Location previousLocation;
+        private Location currentLocation;
+
+        #endregion
+
+        #region Properties
+
+        public int GPSMinTime
+        {
+            get { return 3; }
+        }
+
+        public int GPSMinDistance
+        {
+            get { return 0; }
+        }
+
+        public int DefaultCalibratingPosition
+        {
+            get { return 5; }
+        }
+
+        public double DefaultGpsAccuracy
+        {
+            get { return 6; }
+        }
 
         #endregion
 
@@ -25,63 +53,139 @@ namespace Running_Tracker.Model
         {
             this.runningTrackerDataAccess = runningTrackerDataAccess;
             runningData = null;
-            gps_Status = GPS_Status.NotWorking;
+            remaningCalibratingLocation = DefaultCalibratingPosition;
         }
 
         #endregion
 
         #region Public Methods
 
-        public void changeLocation(Location location)
+        public void ChangeLocation(Location location)
         {
-            throw new NotImplementedException();
+            if (runningData == null) return;
+
+            if(remaningCalibratingLocation > 0)
+            {
+                // Calibrating
+                if (location.Accuracy <= DefaultGpsAccuracy)
+                    remaningCalibratingLocation--;
+
+                if (remaningCalibratingLocation == 0)
+                    OnGPS_Ready();
+            } else
+            {
+                // Working
+                if (location.Accuracy <= DefaultGpsAccuracy)
+                {
+                    previousLocation = currentLocation;
+                    currentLocation = location;
+
+                    double distance = 0;
+                    if(previousLocation != null)
+                        currentLocation.DistanceTo(previousLocation);
+
+                    double verticalDistance = currentLocation.Altitude - previousLocation.Altitude;
+
+                    double up = 0;
+                    double down = 0;
+
+                    if (verticalDistance > 0)
+                    {
+                        up = verticalDistance;
+                    } else
+                    {
+                        down = -verticalDistance;
+                    }
+
+                    LocationData currentLocationData = new LocationData(currentLocation, distance, up, down);
+                    runningData.Add(currentLocationData);
+                    
+                    OnNewPosition(currentLocationData);
+
+                    // Warning
+
+                    if(runningData.Time > CurrentWarningValues.Time)
+                    {
+                        OnWarning(WarningType.Time);
+                    } else if(runningData.Distance > CurrentWarningValues.Distance)
+                    {
+                        OnWarning(WarningType.Distance);
+                    } else if(currentLocation.Speed == 0)
+                    {
+                        OnWarning(WarningType.DistanceStop);
+                    } else if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
+                    {
+                        OnWarning(WarningType.DistanceSlow);
+                    } else if(currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
+                    {
+                        OnWarning(WarningType.DistanceFast);
+                    }
+                }
+            }
         }
 
-        public void startRunning()
+        public void Calibrate()
         {
-            throw new NotImplementedException();
+            remaningCalibratingLocation = DefaultCalibratingPosition;
         }
 
-        public void stopRunning()
+        public void StartRunning()
         {
-            throw new NotImplementedException();
+            if (remaningCalibratingLocation == 0)
+                runningData = new RunningData(CurrentPersonalDatas);
+            else
+                OnGPS_NotReady();
+        }
+
+        public void StopRunning()
+        {
+            runningData.Finish();
+            SaveRunning(runningData);
+            runningData = null;
         }
 
         #endregion
 
         #region Events
 
+        public event EventHandler GPS_Ready;
+        public event EventHandler GPS_NotReady;
+
         public event EventHandler<PositionArgs> NewPosition;
-        public event EventHandler<PositionArgs> GPS_Ready;
+        public event EventHandler<WarningArgs> Warning;
 
         private void OnNewPosition(LocationData location)
         {
-            throw new NotImplementedException();
-
-            if (GPS_Ready != null)
-                GPS_Ready(this, new PositionArgs(location));
+            NewPosition?.Invoke(this, new PositionArgs(location));
         }
 
-        private void OnGPS_Ready(LocationData location)
+        private void OnWarning(WarningType warning)
         {
-            throw new NotImplementedException();
+            Warning?.Invoke(this, new WarningArgs(warning));
+        }
 
-            if (GPS_Ready != null)
-                GPS_Ready(this, new PositionArgs(location));
+        private void OnGPS_NotReady()
+        {
+            GPS_NotReady?.Invoke(this, EventArgs.Empty);
+        }
+
+        private void OnGPS_Ready()
+        {
+            GPS_Ready?.Invoke(this, EventArgs.Empty);
         }
 
         #endregion
 
         #region Persistence Methods
 
-        public void saveRunning(RunningData running)
+        public void SaveRunning(RunningData running)
         {
-            runningTrackerDataAccess.saveRunning(running);
+            runningTrackerDataAccess.SaveRunning(running);
         }
 
-        public void deleteRunning(RunningData running)
+        public void DeleteRunning(RunningData running)
         {
-            runningTrackerDataAccess.deleteRunning(running);
+            runningTrackerDataAccess.DeleteRunning(running);
         }
 
         public PersonalDatas CurrentPersonalDatas

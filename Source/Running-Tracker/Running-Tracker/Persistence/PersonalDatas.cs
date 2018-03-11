@@ -16,8 +16,8 @@ namespace Running_Tracker.Persistence
     {
         public Gender Sex { get; set; }
 
-        int Height { get; set; }
+        public int Height { get; set; }
 
-        int Weight { get; set; }
+        public int Weight { get; set; }
     }
 }

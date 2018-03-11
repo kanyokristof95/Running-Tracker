@@ -19,17 +19,17 @@ namespace Running_Tracker.Persistence
 
         }
         
-        public List<RunningData> loadPreviousRunnings()
+        public List<RunningData> LoadPreviousRunnings()
         {
             throw new NotImplementedException();
         }
 
-        public void saveRunning(RunningData running)
+        public void SaveRunning(RunningData running)
         {
             throw new NotImplementedException();
         }
 
-        public void deleteRunning(RunningData running)
+        public void DeleteRunning(RunningData running)
         {
             throw new NotImplementedException();
         }

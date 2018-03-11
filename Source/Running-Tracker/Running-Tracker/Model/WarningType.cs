@@ -12,10 +12,12 @@ using Android.Widget;
 
 namespace Running_Tracker.Model
 {
-    public enum GPS_Status
+    public enum WarningType
     {
-        NotWorking,
-        Calibrate,
-        Working
+        DistanceStop,
+        DistanceSlow,
+        DistanceFast,
+        Time,
+        Distance
     }
 }
