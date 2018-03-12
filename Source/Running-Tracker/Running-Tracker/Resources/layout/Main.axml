@@ -99,5 +99,5 @@
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
         android:textColor="@android:color/white"
-        android:layout_marginTop="10dp"/>
+        android:layout_marginTop="0dp" />
 </LinearLayout>

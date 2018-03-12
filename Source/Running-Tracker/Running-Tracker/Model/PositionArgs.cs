@@ -6,7 +6,7 @@ namespace Running_Tracker.Model
     public class PositionArgs : EventArgs
     {
         private LocationData locationData;
-
+        
         public PositionArgs(LocationData locationData)
         {
             this.locationData = locationData;

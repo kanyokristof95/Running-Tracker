@@ -94,7 +94,7 @@ namespace Running_Tracker.Persistence
         {
             get
             {
-                throw new NotImplementedException();
+                return 0; // TODO
             }
         }
 
