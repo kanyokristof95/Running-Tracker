@@ -9,23 +9,44 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using System;
 using System.Timers;
+using System.Collections.Generic;
+using Android.Graphics;
 
 namespace Running_Tracker.ViewActivity
 {
     [Activity(Label = "Running_Tracker", MainLauncher = true, Theme = "@style/MyTheme")]
     public class MainActivity : BaseActivity, ILocationListener, IOnMapReadyCallback
     {
+        public enum MainButtonStates
+        {
+            Calibrating,
+            Start,
+            Stop
+        }
+
+        public MainButtonStates MainButtonState{ get; set; }
+        
+
         GoogleMap _map;
         MapFragment _mapFragment;
 
         Timer secCounter;
         int hour, min, sec;
         TextView txtTime;
-        
+
+        private Button mainButton;
+
         private LocationManager locationManager;
         private string locationProvider;
 
         private Dialog dialog;
+
+        TextView speedTextView;
+        TextView distanceTextView;
+        double sumDistance;
+
+        List<LatLng> lines;
+        PolylineOptions rectOptions;
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -34,6 +55,23 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.Main);
             Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
+
+            //view-n lévő vezérlők megkeresése
+            speedTextView = FindViewById<TextView>(Resource.Id.speed);
+            distanceTextView = FindViewById<TextView>(Resource.Id.distance);
+            
+
+            //gps eseménykezelő
+             model.GPS_Ready += Model_GPS_Ready;
+             model.NewPosition += Model_NewPosition;
+
+
+            //inicializáció
+            MainButtonState = MainButtonStates.Calibrating;
+            sumDistance = 0;
+            lines = new List<LatLng>();
+            rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+
 
             //toolbar
             Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
@@ -44,9 +82,9 @@ namespace Running_Tracker.ViewActivity
             hour = 0;
             min = 0;
             sec = 0;
-            Button mainButton = FindViewById<Button>(Resource.Id.mainButton);
+            mainButton = FindViewById<Button>(Resource.Id.mainButton);
             txtTime = FindViewById<TextView>(Resource.Id.txtTimer);
-            mainButton.Click += StartButton_Click;
+            mainButton.Click += MainButton_Clicked;
 
             //map integráció
             _mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
@@ -65,20 +103,72 @@ namespace Running_Tracker.ViewActivity
             }
 
             _mapFragment.GetMapAsync(this);
-
-           
         }
 
-        private void StartButton_Click(object sender, EventArgs e)
+        private void Model_NewPosition(object sender, Model.PositionArgs e)
         {
-            //TODO AZ ELEJÉN CALCULATING FELIRAT, NEM KATTINTHATÓ, AZUTÁN START, VÉGÉN STOP
-            secCounter = new Timer();
-            secCounter.Interval = 1000;
-            secCounter.Elapsed += SecCounterTimerElapsed;
-            secCounter.Start();
+            Toast.MakeText(this, "Model_new_position", ToastLength.Long).Show();
+            //speed refresh
+            speedTextView.Text = (e.LocationData.Speed / 3.6).ToString();
+
+            //distance refresh
+            sumDistance = sumDistance + e.LocationData.Distance;
+            distanceTextView.Text = sumDistance.ToString();
+
+            //TODO map refresh
+            _map.Clear();
+            lines.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+
+            rectOptions.Add(lines[lines.Count-1]);
+
+            _map.AddPolyline(rectOptions);
+            
         }
 
-        private void SecCounterTimerElapsed(object sender, ElapsedEventArgs e)
+        private void Model_GPS_Ready(object sender, Model.PositionArgs e)
+        {
+            LatLng location = new LatLng(e.LocationData.Latitude,e.LocationData.Longitude);
+            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+            builder.Target(location);
+            builder.Zoom(14);
+            CameraPosition cameraPosition = builder.Build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+
+            _map.MoveCamera(cameraUpdate);
+
+           if(MainButtonState == MainButtonStates.Calibrating){ 
+            mainButton.Text = "Start";
+            MainButtonState = MainButtonStates.Start;
+            }
+        }
+        
+
+        private void MainButton_Clicked(object sender, EventArgs e)
+        {
+
+           switch (MainButtonState)
+            {
+                case MainButtonStates.Calibrating:
+                    Toast.MakeText(this, "GPS calibration in progress, please wait.", ToastLength.Long).Show();
+                    break;
+                case MainButtonStates.Start:
+                    secCounter = new Timer();
+                    secCounter.Interval = 1000;
+                    secCounter.Elapsed += SecCounterTimer_Elapsed;
+                    secCounter.Start();
+                    MainButtonState = MainButtonStates.Stop;
+                    mainButton.Text = "Stop";
+                    model.StartRunning();
+                    break;
+                case MainButtonStates.Stop:
+                    secCounter.Stop();
+                    model.StopRunning();
+                    //TODO inicializálás alaphelyzetre
+                    break;
+            }     
+        }
+
+        private void SecCounterTimer_Elapsed(object sender, ElapsedEventArgs e)
         {
             sec++;
             if(sec == 60)
@@ -101,10 +191,10 @@ namespace Running_Tracker.ViewActivity
         {
             _map = map;
 
-            LatLng location = new LatLng(37.785559, -122.396728);
+            LatLng location = new LatLng(47.162494, 19.503304);
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
-            builder.Zoom(14);
+            builder.Zoom(6);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 

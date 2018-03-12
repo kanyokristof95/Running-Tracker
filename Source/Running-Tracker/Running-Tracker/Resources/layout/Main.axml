@@ -93,10 +93,11 @@
         android:layout_weight="1"
         android:layout_marginTop="10dp" />
     <Button
-        android:text="Button"
+        android:text="Calibrating..."
         android:id="@+id/mainButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="?attr/colorPrimary"
-        android:textColor="@android:color/white" />
+        android:textColor="@android:color/white"
+        android:layout_marginTop="10dp"/>
 </LinearLayout>
