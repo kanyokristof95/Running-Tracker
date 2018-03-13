@@ -176,6 +176,9 @@ namespace Running_Tracker.ViewActivity
             mainButton.Text = "Start";
             MainButtonState = MainButtonStates.Start;
             }
+
+            /*Vibrator vibrator = (Vibrator) GetSystemService(VibratorService);
+            vibrator.Vibrate(100);*/
         }
         
 
