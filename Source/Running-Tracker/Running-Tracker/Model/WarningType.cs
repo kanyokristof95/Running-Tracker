@@ -2,9 +2,8 @@
 {
     public enum WarningType
     {
-        DistanceStop,
-        DistanceSlow,
-        DistanceFast,
+        SpeedSlow,
+        SpeedFast,
         Time,
         Distance
     }

@@ -62,11 +62,11 @@ namespace Running_Tracker.ViewActivity
             distanceTextView = FindViewById<TextView>(Resource.Id.distance);
             
 
-            //gps eseménykezelő
-             model.GPS_Ready += Model_GPS_Ready;
-             model.NewPosition += Model_NewPosition;
+            //eseménykezelő
+            model.GPS_Ready += Model_GPS_Ready;
+            model.NewPosition += Model_NewPosition;
             model.CurrentTimeSpan += Model_CurrentTimeSpan;
-
+            model.Warning += Model_Warning;
 
             //inicializáció
             MainButtonState = MainButtonStates.Calibrating;
@@ -108,6 +108,29 @@ namespace Running_Tracker.ViewActivity
             _mapFragment.GetMapAsync(this);
         }
 
+        private void Model_Warning(object sender, Model.WarningArgs e)
+        {
+            Vibrator vibrator = (Vibrator) GetSystemService(VibratorService);
+            vibrator.Vibrate(100);
+
+            switch (e.Warning)
+            {
+                case Model.WarningType.Distance:
+                    Toast.MakeText(this, "You reached the required distance.", ToastLength.Long).Show();
+                    break;
+                case Model.WarningType.SpeedFast:
+                    Toast.MakeText(this, "You are too fast.", ToastLength.Long).Show();
+                    break;
+                case Model.WarningType.SpeedSlow:
+                    Toast.MakeText(this, "You are too slow.", ToastLength.Long).Show();
+                    break;
+                case Model.WarningType.Time:
+                    Toast.MakeText(this, "You reached the required time.", ToastLength.Long).Show();
+                    break;
+            }
+        }
+
+
         private void Model_CurrentTimeSpan(object sender, Model.TimeSpanArgs e)
         {
             hour = e.Time.Hours;
@@ -122,7 +145,6 @@ namespace Running_Tracker.ViewActivity
 
         private void Model_NewPosition(object sender, Model.PositionArgs e)
         {
-            Toast.MakeText(this, "Model_new_position", ToastLength.Long).Show();
             //speed refresh
             speedTextView.Text = e.LocationData.Speed.ToString();
 
@@ -134,6 +156,7 @@ namespace Running_Tracker.ViewActivity
             _map.Clear();
             if (e.LocationData.RunningSpeedType == Persistence.RunningSpeed.Stop)
             {
+                Toast.MakeText(this, "TEST", ToastLength.Long).Show();
                 circles.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
             }
             else
@@ -176,9 +199,6 @@ namespace Running_Tracker.ViewActivity
             mainButton.Text = "Start";
             MainButtonState = MainButtonStates.Start;
             }
-
-            /*Vibrator vibrator = (Vibrator) GetSystemService(VibratorService);
-            vibrator.Vibrate(100);*/
         }
         
 
@@ -224,10 +244,9 @@ namespace Running_Tracker.ViewActivity
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.InvokeCenter(circleCenter);
             circleOptions.InvokeRadius(35);
-            //circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
+            circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
             circleOptions.InvokeStrokeColor(Color.Black);
-            circleOptions.InvokeFillColor(0x30ff0000);
-            circleOptions.InvokeStrokeWidth(2);
+            circleOptions.InvokeStrokeWidth(1);
 
             _map.AddCircle(circleOptions);
         }

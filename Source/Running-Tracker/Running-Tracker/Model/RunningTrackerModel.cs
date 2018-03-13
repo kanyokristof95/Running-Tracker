@@ -221,13 +221,13 @@ namespace Running_Tracker.Model
                         if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
                         {
                             speedWarningFrequency = SpeedWarningFrequency;
-                            OnWarning(WarningType.DistanceSlow);
+                            OnWarning(WarningType.SpeedSlow);
                         }
 
                         if (currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
                         {
                             speedWarningFrequency = SpeedWarningFrequency;
-                            OnWarning(WarningType.DistanceFast);
+                            OnWarning(WarningType.SpeedFast);
                         }
                     }
                 }
