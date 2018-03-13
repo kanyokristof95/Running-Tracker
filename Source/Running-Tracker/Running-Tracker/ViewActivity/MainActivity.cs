@@ -46,6 +46,7 @@ namespace Running_Tracker.ViewActivity
         double sumDistance;
 
         List<LatLng> lines;
+        List<LatLng> circles;
         PolylineOptions rectOptions;
 
 
@@ -70,6 +71,7 @@ namespace Running_Tracker.ViewActivity
             MainButtonState = MainButtonStates.Calibrating;
             sumDistance = 0;
             lines = new List<LatLng>();
+            circles = new List<LatLng>();
             rectOptions = new PolylineOptions().InvokeColor(Color.Red);
 
 
@@ -115,14 +117,25 @@ namespace Running_Tracker.ViewActivity
             sumDistance = sumDistance + e.LocationData.Distance;
             distanceTextView.Text = sumDistance.ToString();
 
-            //TODO map refresh
+            // map refresh
             _map.Clear();
-            lines.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
-
-            rectOptions.Add(lines[lines.Count-1]);
-
+            if (e.LocationData.RunningSpeedType == Persistence.RunningSpeed.Stop)
+            {
+                circles.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            }
+            else
+            {
+                lines.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+                rectOptions.Add(lines[lines.Count - 1]);
+            }
+            //draw
             _map.AddPolyline(rectOptions);
-            
+
+            foreach (var circle in circles)
+            {
+                drawCircle(circle);
+            }
+
         }
 
         private void Model_GPS_Ready(object sender, Model.PositionArgs e)
@@ -152,6 +165,7 @@ namespace Running_Tracker.ViewActivity
                     Toast.MakeText(this, "GPS calibration in progress, please wait.", ToastLength.Long).Show();
                     break;
                 case MainButtonStates.Start:
+                    distanceTextView.Text = "0";
                     secCounter = new Timer();
                     secCounter.Interval = 1000;
                     secCounter.Elapsed += SecCounterTimer_Elapsed;
@@ -163,6 +177,8 @@ namespace Running_Tracker.ViewActivity
                 case MainButtonStates.Stop:
                     secCounter.Stop();
                     model.StopRunning();
+                    MainButtonState = MainButtonStates.Start;
+                    mainButton.Text = "Start";
                     //TODO inicializálás alaphelyzetre
                     break;
             }     
@@ -199,9 +215,20 @@ namespace Running_Tracker.ViewActivity
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
             _map.MoveCamera(cameraUpdate);
+            
         }
+        private void drawCircle(LatLng circleCenter)
+        {
+            CircleOptions circleOptions = new CircleOptions();
+            circleOptions.InvokeCenter(circleCenter);
+            circleOptions.InvokeRadius(35);
+            circleOptions.InvokeStrokeColor(Color.Black);
+            circleOptions.InvokeFillColor(0x30ff0000);
+            circleOptions.InvokeStrokeWidth(2);
 
-        private void gpsSettings()
+            _map.AddCircle(circleOptions);
+        }
+            private void gpsSettings()
         {
             locationManager = (LocationManager)GetSystemService(LocationService);
 
