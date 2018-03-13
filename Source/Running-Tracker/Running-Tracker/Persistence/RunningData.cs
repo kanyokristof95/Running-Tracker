@@ -94,7 +94,8 @@ namespace Running_Tracker.Persistence
         {
             get
             {
-                return 0; // TODO
+                double calcCoefficient = 0.790; // Running - 0.790, Biking - 0.28, Swimming - 2.93
+                return calcCoefficient * personalDatas.Weight * 2.2046 * Distance / 1609.344;
             }
         }
 
