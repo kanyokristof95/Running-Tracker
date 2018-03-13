@@ -1596,14 +1596,17 @@ namespace Running_Tracker
 			// aapt resource value: 0x7f02005b
 			public const int history = 2130837595;
 			
-			// aapt resource value: 0x7f02005e
-			public const int notification_template_icon_bg = 2130837598;
-			
 			// aapt resource value: 0x7f02005c
-			public const int setting = 2130837596;
+			public const int icon = 2130837596;
+			
+			// aapt resource value: 0x7f02005f
+			public const int notification_template_icon_bg = 2130837599;
 			
 			// aapt resource value: 0x7f02005d
-			public const int undo = 2130837597;
+			public const int setting = 2130837597;
+			
+			// aapt resource value: 0x7f02005e
+			public const int undo = 2130837598;
 			
 			static Drawable()
 			{

@@ -4,6 +4,9 @@ namespace Running_Tracker.Persistence
 {
     public class LocationData
     {
+        /// <summary>
+        /// km/h
+        /// </summary>
         public double Speed { get; private set; }
 
         public double Latitude { get; private set; }

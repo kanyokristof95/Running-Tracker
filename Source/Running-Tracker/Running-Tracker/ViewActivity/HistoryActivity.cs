@@ -5,6 +5,7 @@ using System.Text;
 
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Runtime;
 using Android.Support.V7.App;
@@ -13,7 +14,7 @@ using Android.Widget;
 
 namespace Running_Tracker.ViewActivity
 {
-    [Activity(Label = "HistoryActivity", Theme = "@style/MyTheme")]
+    [Activity(Label = "HistoryActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class HistoryActivity : BaseActivity
     {
         private List<string> mItems;

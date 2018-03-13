@@ -11,10 +11,11 @@ using System;
 using System.Timers;
 using System.Collections.Generic;
 using Android.Graphics;
+using Android.Content.PM;
 
 namespace Running_Tracker.ViewActivity
 {
-    [Activity(Label = "Running_Tracker", MainLauncher = true, Theme = "@style/MyTheme")]
+    [Activity(Label = "@string/app_name", MainLauncher = true, Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class MainActivity : BaseActivity, ILocationListener, IOnMapReadyCallback
     {
         public enum MainButtonStates

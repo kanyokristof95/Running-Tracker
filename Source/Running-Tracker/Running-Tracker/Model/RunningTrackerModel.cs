@@ -17,6 +17,12 @@ namespace Running_Tracker.Model
 
         private int remaningCalibratingLocation;
 
+        private int speedWarningFrequency;
+        private int distanceWarningFrequency;
+        private int timeWarningFrequency;
+        private int stopWarningFrequency;
+
+
         private Location previousLocation;
         private Location currentLocation;
 
@@ -41,7 +47,7 @@ namespace Running_Tracker.Model
 
         public double DefaultGpsAccuracy
         {
-            get { return 60; } // TODO - to 6
+            get { return 6; } // TODO - to 6
         }
 
         /// <summary>
@@ -58,6 +64,27 @@ namespace Running_Tracker.Model
         public double FastRunning
         {
             get { return 16; }
+        }
+
+        // Warning frequency
+        public int SpeedWarningFrequency
+        {
+            get { return 10; }
+        }
+
+        public int DistanceWarningFrequency
+        {
+            get { return 30; }
+        }
+
+        public int TimeWarningFrequency
+        {
+            get { return 30; }
+        }
+
+        public int StopWarningFrequency
+        {
+            get { return 10; }
         }
 
         #endregion
@@ -104,6 +131,8 @@ namespace Running_Tracker.Model
 
                 if (runningData == null) return;
 
+                if (previousLocation != null && previousLocation.Speed == 0 && location.Speed == 0) return;
+
                 if (location.Accuracy <= DefaultGpsAccuracy)
                 {
                     previousLocation = currentLocation;
@@ -135,8 +164,6 @@ namespace Running_Tracker.Model
                     if (previousLocation == null)
                     {
                         runningSpeed = RunningSpeed.StartPoint;
-                    } else if (speed == 0) {
-                        runningSpeed = RunningSpeed.Stop;
                     } else if (speed < SlowRunning)
                     {
                         runningSpeed = RunningSpeed.Slow;
@@ -148,28 +175,67 @@ namespace Running_Tracker.Model
                         runningSpeed = RunningSpeed.Normal;
                     }
 
+                    if (stopWarningFrequency > 0)
+                    {
+                        stopWarningFrequency--;
+                    }
+                    else
+                    {
+                        if (currentLocation.Speed == 0)
+                        {
+                            stopWarningFrequency = StopWarningFrequency;
+                            runningSpeed = RunningSpeed.Slow;
+                        }
+                    }
+
                     LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
                     runningData.Add(currentLocationData);
                     
                     OnNewPosition(currentLocationData);
-
+                    
                     // Warning
-                    // TODO - Ne küldje folyamatosan a jelet
-                    if(runningData.Time > CurrentWarningValues.Time)
+                    if (timeWarningFrequency > 0)
                     {
-                        OnWarning(WarningType.Time);
-                    } else if(runningData.Distance > CurrentWarningValues.Distance)
+                        timeWarningFrequency--;
+                    }
+                    else
                     {
-                        OnWarning(WarningType.Distance);
-                    } else if(currentLocation.Speed == 0)
+                        if (runningData.Time > CurrentWarningValues.Time)
+                        {
+                            timeWarningFrequency = TimeWarningFrequency;
+                            OnWarning(WarningType.Time);
+                        }
+                    }
+
+                    if(distanceWarningFrequency > 0)
                     {
-                        OnWarning(WarningType.DistanceStop);
-                    } else if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
+                        distanceWarningFrequency--;
+                    } else
                     {
-                        OnWarning(WarningType.DistanceSlow);
-                    } else if(currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
+                        if (runningData.Distance > CurrentWarningValues.Distance)
+                        {
+                            distanceWarningFrequency = DistanceWarningFrequency;
+                            OnWarning(WarningType.Distance);
+                        }
+                    }
+                    
+                    if (speedWarningFrequency > 0)
                     {
-                        OnWarning(WarningType.DistanceFast);
+                        speedWarningFrequency--;
+                    }
+                    else
+                    {
+                        if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
+                        {
+                            speedWarningFrequency = SpeedWarningFrequency;
+                            OnWarning(WarningType.DistanceSlow);
+                        }
+
+                        if (currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
+                        {
+                            speedWarningFrequency = SpeedWarningFrequency;
+                            OnWarning(WarningType.DistanceFast);
+                        }
                     }
                 }
             }
@@ -186,6 +252,10 @@ namespace Running_Tracker.Model
             if (remaningCalibratingLocation == 0)
             {
                 runningData = new RunningData(CurrentPersonalDatas);
+                speedWarningFrequency = SpeedWarningFrequency;
+                distanceWarningFrequency = DistanceWarningFrequency;
+                timeWarningFrequency = TimeWarningFrequency;
+                stopWarningFrequency = StopWarningFrequency;
                 timer.Start();
             } else
             {

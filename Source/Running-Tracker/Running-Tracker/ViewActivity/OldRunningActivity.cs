@@ -14,10 +14,11 @@ using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
 using System.Timers;
+using Android.Content.PM;
 
 namespace Running_Tracker.ViewActivity
 {
-    [Activity(Label = "OldRunningActivity", Theme = "@style/MyTheme")]
+    [Activity(Label = "OldRunningActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class OldRunningActivity : BaseActivity , IOnMapReadyCallback
     {
         GoogleMap _map;

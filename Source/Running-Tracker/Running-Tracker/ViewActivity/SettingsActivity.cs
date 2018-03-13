@@ -1,6 +1,7 @@
 ﻿
 using Android.App;
 using Android.Content;
+using Android.Content.PM;
 using Android.OS;
 using Android.Support.V7.App;
 using Android.Views;
@@ -9,7 +10,7 @@ using System;
 
 namespace Running_Tracker.ViewActivity
 {
-    [Activity(Label = "SettingsActivity", Theme = "@style/MyTheme")]
+    [Activity(Label = "SettingsActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class SettingsActivity : BaseActivity
     {
         protected override void OnCreate(Bundle savedInstanceState)
