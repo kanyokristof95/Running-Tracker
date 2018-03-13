@@ -140,7 +140,7 @@ namespace Running_Tracker.Model
                 if (runningData == null)
                 {
                     // The running is not started
-                    OnUserPosition(new LocationData(currentLocation.Longitude, currentLocation.Longitude));
+                    OnUserPosition(new LocationData(location.Longitude, location.Longitude));
                     return;
                 }
 
