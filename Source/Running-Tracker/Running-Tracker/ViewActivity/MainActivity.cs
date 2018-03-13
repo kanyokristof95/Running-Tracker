@@ -31,7 +31,6 @@ namespace Running_Tracker.ViewActivity
         GoogleMap _map;
         MapFragment _mapFragment;
 
-        Timer secCounter;
         int hour, min, sec;
         TextView txtTime;
 
@@ -66,6 +65,7 @@ namespace Running_Tracker.ViewActivity
             //gps eseménykezelő
              model.GPS_Ready += Model_GPS_Ready;
              model.NewPosition += Model_NewPosition;
+            model.CurrentTimeSpan += Model_CurrentTimeSpan;
 
 
             //inicializáció
@@ -108,11 +108,23 @@ namespace Running_Tracker.ViewActivity
             _mapFragment.GetMapAsync(this);
         }
 
+        private void Model_CurrentTimeSpan(object sender, Model.TimeSpanArgs e)
+        {
+            hour = e.Time.Hours;
+            min = e.Time.Minutes;
+            sec = e.Time.Seconds;
+
+            RunOnUiThread(() =>
+            {
+                txtTime.Text = String.Format("{0:00}:{1:00}:{2:00}", hour, min, sec);
+            });
+        }
+
         private void Model_NewPosition(object sender, Model.PositionArgs e)
         {
             Toast.MakeText(this, "Model_new_position", ToastLength.Long).Show();
             //speed refresh
-            speedTextView.Text = (e.LocationData.Speed / 3.6).ToString();
+            speedTextView.Text = e.LocationData.Speed.ToString();
 
             //distance refresh
             sumDistance = sumDistance + e.LocationData.Distance;
@@ -137,6 +149,16 @@ namespace Running_Tracker.ViewActivity
                 drawCircle(circle);
             }
 
+            //user current position
+            CircleOptions circleOptions = new CircleOptions();
+            circleOptions.InvokeCenter(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            circleOptions.InvokeRadius(9);
+            circleOptions.InvokeStrokeColor(Color.White);
+            circleOptions.InvokeFillColor(Color.Rgb(69, 140, 228));
+            circleOptions.InvokeStrokeWidth(2);
+
+            _map.AddCircle(circleOptions);
+
         }
 
         private void Model_GPS_Ready(object sender, Model.PositionArgs e)
@@ -144,7 +166,7 @@ namespace Running_Tracker.ViewActivity
             LatLng location = new LatLng(e.LocationData.Latitude,e.LocationData.Longitude);
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
-            builder.Zoom(14);
+            builder.Zoom(16);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
@@ -167,41 +189,17 @@ namespace Running_Tracker.ViewActivity
                     break;
                 case MainButtonStates.Start:
                     distanceTextView.Text = "0";
-                    secCounter = new Timer();
-                    secCounter.Interval = 1000;
-                    secCounter.Elapsed += SecCounterTimer_Elapsed;
-                    secCounter.Start();
                     MainButtonState = MainButtonStates.Stop;
                     mainButton.Text = "Stop";
                     model.StartRunning();
                     break;
                 case MainButtonStates.Stop:
-                    secCounter.Stop();
                     model.StopRunning();
                     MainButtonState = MainButtonStates.Start;
                     mainButton.Text = "Start";
                     //TODO inicializálás alaphelyzetre
                     break;
             }     
-        }
-
-        private void SecCounterTimer_Elapsed(object sender, ElapsedEventArgs e)
-        {
-            sec++;
-            if(sec == 60)
-            {
-                min++;
-                sec = 0;
-            }
-            if(min == 60)
-            {
-                hour++;
-                min = 0;
-            }
-            RunOnUiThread(() =>
-           {
-           txtTime.Text = String.Format("{0:00}:{1:00}:{2:00}", hour, min, sec); 
-           });
         }
 
         public void OnMapReady(GoogleMap map)
@@ -223,6 +221,7 @@ namespace Running_Tracker.ViewActivity
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.InvokeCenter(circleCenter);
             circleOptions.InvokeRadius(35);
+            //circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
             circleOptions.InvokeStrokeColor(Color.Black);
             circleOptions.InvokeFillColor(0x30ff0000);
             circleOptions.InvokeStrokeWidth(2);
@@ -310,21 +309,9 @@ namespace Running_Tracker.ViewActivity
             gpsProviderEnabled();
         }
 
-        public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras)
-        {
-            switch(status)
-            {
-                case Availability.Available:
-                    Toast.MakeText(this, "Status changed: GPS provider is available", ToastLength.Long).Show();
-                    break;
-                case Availability.TemporarilyUnavailable:
-                    Toast.MakeText(this, "Status changed: GPS provider is temporarily unavailable", ToastLength.Long).Show();
-                    break;
-                case Availability.OutOfService:
-                    Toast.MakeText(this, "Status changed: GPS provider is out of service", ToastLength.Long).Show();
-                    break;
-            }
-        }
+        
+        public void OnStatusChanged(string provider, [GeneratedEnum] Availability status, Bundle extras){}
+        
 
         protected override void OnResume()
         {
