@@ -12,28 +12,16 @@ using Android.Widget;
 
 namespace Running_Tracker.Persistence
 {
+    /// <summary>
+    /// Type of running speed.
+    /// </summary>
     public enum RunningSpeed
     {
         Unknown,
-        /// <summary>
-        /// The first point of the running
-        /// </summary>
         StartPoint,
-        /// <summary>
-        /// When the runner stops
-        /// </summary>
         Stop,
-        /// <summary>
-        /// Slow running
-        /// </summary>
         Slow,
-        /// <summary>
-        /// Normal running 
-        /// </summary>
         Normal,
-        /// <summary>
-        /// Fast running
-        /// </summary>
         Fast
     }
 }

@@ -3,6 +3,9 @@ using Running_Tracker.Persistence;
 
 namespace Running_Tracker.Model
 {
+    /// <summary>
+    /// Contains the current location.
+    /// </summary>
     public class PositionArgs : EventArgs
     {
         private LocationData locationData;

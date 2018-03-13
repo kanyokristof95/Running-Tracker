@@ -3,6 +3,9 @@ using System.Collections.Generic;
 
 namespace Running_Tracker.Persistence
 {
+    /// <summary>
+    /// Contains the running datas.
+    /// </summary>
     public class RunningData
     {
         private List<LocationData> locationList;
@@ -15,24 +18,36 @@ namespace Running_Tracker.Persistence
         private double minLatitude;
         private double maxLatitude;
 
+        /// <summary>
+        /// Locations of the running.
+        /// </summary>
         public List<LocationData> Locations
         {
             get { return locationList; }
         }
 
         /// <summary>
-        /// In meter
+        /// The running's distance in meter.
         /// </summary>
         public double Distance
         {
             get { return distance; }
         }
 
+        /// <summary>
+        /// The start date of running.
+        /// </summary>
         public DateTime StartDateTime { get; private set; }
 
+        /// <summary>
+        /// The end date of running.
+        /// </summary>
         public DateTime EndDateTime { get; private set; }
 
-        public TimeSpan Time
+        /// <summary>
+        /// The duration of running.
+        /// </summary>
+        public TimeSpan Duration
         {
             get
             {
@@ -47,15 +62,15 @@ namespace Running_Tracker.Persistence
         }
 
         /// <summary>
-        /// In km/hour
+        /// The average speed of the running in km/h
         /// </summary>
         public double AverageSpeed
         {
-            get { return (Distance / 1000) / (Time.TotalHours); }
+            get { return (Distance / 1000) / (Duration.TotalHours); }
         }
 
         /// <summary>
-        /// In meter
+        /// The vertical up distance of running in meter
         /// </summary>
         public double Up
         {
@@ -73,7 +88,7 @@ namespace Running_Tracker.Persistence
         }
 
         /// <summary>
-        /// In meter
+        /// The vertical down distance of running in meter
         /// </summary>
         public double Down
         {
@@ -90,6 +105,9 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        /// <summary>
+        /// The burned calorie during the running
+        /// </summary>
         public double Calorie
         {
             get
@@ -99,21 +117,33 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        /// <summary>
+        /// The min longitude of running
+        /// </summary>
         public double MinLongitude
         {
             get { return minLongitude; }
         }
 
+        /// <summary>
+        /// The max langitude of running
+        /// </summary>
         public double MaxLongitude
         {
             get { return maxLongitude; }
         }
 
+        /// <summary>
+        /// The min latitude of running
+        /// </summary>
         public double MinLatitude
         {
             get { return minLatitude; }
         }
 
+        /// <summary>
+        /// The max latitude of running
+        /// </summary>
         public double MaxLatitude
         {
             get { return maxLatitude; }
@@ -134,6 +164,9 @@ namespace Running_Tracker.Persistence
             StartDateTime = DateTime.Now;
         }
 
+        /// <summary>
+        /// Add the new location to the list of locations
+        /// </summary>
         public void Add(LocationData location)
         {
             if (open)
@@ -155,6 +188,9 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        /// <summary>
+        /// Finish the running. After it you cannot add new points.
+        /// </summary>
         public void Finish()
         {
             if (open)
@@ -164,6 +200,10 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        /// <summary>
+        /// Convert the RunningData into string.
+        /// </summary>
+        /// <returns>StartDateTime in (yyyy. MM. dd. HH:mm:ss) format</returns>
         public override string ToString()
         {
             return StartDateTime.ToString("yyyy. MM. dd. HH:mm:ss");

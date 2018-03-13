@@ -6,6 +6,9 @@ using System.Timers;
 
 namespace Running_Tracker.Model
 {
+    /// <summary>
+    /// The model of the Running Tracker App
+    /// </summary>
     public class RunningTrackerModel
     {
         #region Fields
@@ -27,64 +30,63 @@ namespace Running_Tracker.Model
 
         #endregion
 
-        #region Properties
+        #region Default values
 
+        /// <summary>
+        /// The minimum time between 2 gps signal.
+        /// </summary>
         public int GPSMinTime
         {
             get { return 1000; }
         }
 
+        /// <summary>
+        /// The minimum distance between 2 gps signal.
+        /// </summary>
         public int GPSMinDistance
         {
             get { return 0; }
         }
 
-        public int DefaultCalibratingPosition
-        {
-            get { return 10; }
-        }
-
-        public double DefaultGpsAccuracy
-        {
-            get { return 6; }
-        }
+        /// <summary>
+        /// The number of position calibrating.
+        /// </summary>
+        public const int DefaultCalibratingPosition = 10;
 
         /// <summary>
-        /// km/h
+        /// The minimum accuracy of gps signal.
         /// </summary>
-        public double SlowRunning
-        {
-            get { return 8; }
-        }
+        public const double DefaultGpsAccuracy = 6;
 
         /// <summary>
-        /// km/h
+        /// Speed of slow running in km/h
         /// </summary>
-        public double FastRunning
-        {
-            get { return 16; }
-        }
+        public const double SlowRunning = 8;
 
-        // Warning frequency
-        public int SpeedWarningFrequency
-        {
-            get { return 10; }
-        }
+        /// <summary>
+        /// Speed of fast running in km/h
+        /// </summary>
+        public const double FastRunning = 16;
 
-        public int DistanceWarningFrequency
-        {
-            get { return 30; }
-        }
+        /// <summary>
+        /// Minimum gps signal between 2 speed warning
+        /// </summary>
+        public const int SpeedWarningFrequency = 10;
 
-        public int TimeWarningFrequency
-        {
-            get { return 30; }
-        }
+        /// <summary>
+        /// Minimum gps signal between 2 distance warning
+        /// </summary>
+        public const int DistanceWarningFrequency = 30;
 
-        public int StopWarningFrequency
-        {
-            get { return 10; }
-        }
+        /// <summary>
+        /// Minimum gps signal between 2 time warning
+        /// </summary>
+        public const int TimeWarningFrequency = 30;
+
+        /// <summary>
+        /// Minimum gps signal between 2 stop warning
+        /// </summary>
+        public const int StopWarningFrequency = 10;
 
         #endregion
 
@@ -99,26 +101,34 @@ namespace Running_Tracker.Model
             {
                 Interval = 1000
             };
-            runningTimer.Elapsed += Timer_Elapsed;
+            runningTimer.Elapsed += RunningTime_Elapsed;
 
             remaningCalibratingLocation = DefaultCalibratingPosition;
         }
 
-        private void Timer_Elapsed(object sender, ElapsedEventArgs e)
+        #endregion
+
+        #region Private Methods
+
+        private void RunningTime_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (runningData != null)
-                OnCurrentTimeSpan(runningData.Time);
+                OnCurrentRunningDuration(runningData.Duration);
         }
 
         #endregion
 
         #region Public Methods
 
+        /// <summary>
+        /// Change the user's location
+        /// </summary>
+        /// <param name="location">New location</param>
         public void ChangeLocation(Location location)
         {
             if(remaningCalibratingLocation > 0)
             {
-                // Calibrating
+                // Calibrating the gps
                 if (location.Accuracy <= DefaultGpsAccuracy)
                     remaningCalibratingLocation--;
 
@@ -126,10 +136,15 @@ namespace Running_Tracker.Model
                     OnGPS_Ready(new LocationData(location.Longitude, location.Latitude));
             } else
             {
-                // Working
+                // The gps is calibrated
+                if (runningData == null)
+                {
+                    // The running is not started
+                    OnUserPosition(new LocationData(currentLocation.Longitude, currentLocation.Longitude));
+                    return;
+                }
 
-                if (runningData == null) return;
-
+                // Reduce the warning frequencies
                 if (stopWarningFrequency > 0)
                     stopWarningFrequency--;
 
@@ -142,8 +157,10 @@ namespace Running_Tracker.Model
                 if (speedWarningFrequency > 0)
                     speedWarningFrequency--;
 
+                // If the user's position is not changed do nothing 
                 if (previousLocation != null && previousLocation.Speed == 0 && location.Speed == 0) return;
 
+                // Check the accuracy
                 if (location.Accuracy <= DefaultGpsAccuracy)
                 {
                     previousLocation = currentLocation;
@@ -154,7 +171,7 @@ namespace Running_Tracker.Model
 
                     if (previousLocation != null)
                     {
-                        distance = currentLocation.DistanceTo(previousLocation);
+                        distance = Math.Round(currentLocation.DistanceTo(previousLocation), 2);
                         verticalDistance = currentLocation.Altitude - previousLocation.Altitude;
                     }
 
@@ -169,7 +186,7 @@ namespace Running_Tracker.Model
                         down = -verticalDistance;
                     }
 
-                    double speed = location.Speed * 3.6;
+                    double speed = Math.Round(location.Speed * 3.6, 2);
 
                     RunningSpeed runningSpeed;
                     if (previousLocation == null)
@@ -197,10 +214,10 @@ namespace Running_Tracker.Model
                     
                     OnNewPosition(currentLocationData);
                     
-                    // Warning
+                    // Send warning signals
                     if (timeWarningFrequency == 0)
                     {
-                        if (runningData.Time > CurrentWarningValues.Time)
+                        if (runningData.Duration > CurrentWarningValues.Time)
                         {
                             timeWarningFrequency = TimeWarningFrequency;
                             OnWarning(WarningType.Time);
@@ -234,14 +251,19 @@ namespace Running_Tracker.Model
             }
         }
 
+        /// <summary>
+        /// Calibrate the gps
+        /// </summary>
         public void Calibrate()
         {
             remaningCalibratingLocation = DefaultCalibratingPosition;
         }
 
+        /// <summary>
+        /// Start a new running
+        /// </summary>
         public void StartRunning()
         {
-            // Küldje el, hogy mióta fut
             if (remaningCalibratingLocation == 0)
             {
                 runningData = new RunningData(CurrentPersonalDatas);
@@ -255,7 +277,10 @@ namespace Running_Tracker.Model
                 OnGPS_NotReady();
             }
         }
-
+        
+        /// <summary>
+        /// Stop and save the current running.
+        /// </summary>
         public void StopRunning()
         {
             if(runningData != null)
@@ -270,23 +295,50 @@ namespace Running_Tracker.Model
         #endregion
 
         #region Events
-
+        /// <summary>
+        /// This signal is sent when the gps configuration is ready.
+        /// </summary>
         public event EventHandler<PositionArgs> GPS_Ready;
+
+        /// <summary>
+        /// This signal is sent when the user try to start a new running but the gps is not configured.
+        /// </summary>
         public event EventHandler GPS_NotReady;
 
+        /// <summary>
+        /// This signal is sent when a new position was processed and saved by the model.
+        /// </summary>
         public event EventHandler<PositionArgs> NewPosition;
-        public event EventHandler<TimeSpanArgs> CurrentTimeSpan;
+
+        /// <summary>
+        /// This signal is sent when the running is not started. It contains the user's latest position.
+        /// </summary>
+        public event EventHandler<PositionArgs> UserPosition;
+
+        /// <summary>
+        /// This signal is sent continously during the running. It contains the duration of current running.
+        /// </summary>
+        public event EventHandler<TimeSpanArgs> CurrentRunningDuration;
+
+        /// <summary>
+        /// This signal is sent when a warning was occured.
+        /// </summary>
         public event EventHandler<WarningArgs> Warning;
-        
+
 
         private void OnNewPosition(LocationData location)
         {
             NewPosition?.Invoke(this, new PositionArgs(location));
         }
 
-        private void OnCurrentTimeSpan(TimeSpan timeSpan)
+        private void OnUserPosition(LocationData location)
         {
-            CurrentTimeSpan?.Invoke(this, new TimeSpanArgs(timeSpan));
+            UserPosition?.Invoke(this, new PositionArgs(location));
+        }
+
+        private void OnCurrentRunningDuration(TimeSpan timeSpan)
+        {
+            CurrentRunningDuration?.Invoke(this, new TimeSpanArgs(timeSpan));
         }
 
         private void OnWarning(WarningType warning)
@@ -308,6 +360,9 @@ namespace Running_Tracker.Model
 
         #region Persistence Methods
 
+        /// <summary>
+        /// Returns the current running's locations.
+        /// </summary>
         public List<LocationData> Locations
         {
             get
@@ -316,27 +371,43 @@ namespace Running_Tracker.Model
             }
         }
 
+        /// <summary>
+        /// Returns the previous saved runnings.
+        /// </summary>
         public List<RunningData> LoadPreviousRunnings()
         {
             return runningTrackerDataAccess.LoadPreviousRunnings();
         }
 
+        /// <summary>
+        /// Save the running in the parameter.
+        /// </summary>
         public void SaveRunning(RunningData running)
         {
-            runningTrackerDataAccess.SaveRunning(running);
+            if(running.Locations.Count >= 2)
+                runningTrackerDataAccess.SaveRunning(running);
         }
 
+        /// <summary>
+        /// Delete the running in the parameter.
+        /// </summary>
         public void DeleteRunning(RunningData running)
         {
             runningTrackerDataAccess.DeleteRunning(running);
         }
 
+        /// <summary>
+        /// Property for the current personal datas.
+        /// </summary>
         public PersonalDatas CurrentPersonalDatas
         {
             get { return runningTrackerDataAccess.CurrentPersonalDatas; }
             set { runningTrackerDataAccess.CurrentPersonalDatas = value; }
         }
 
+        /// <summary>
+        /// Property for the current warning values.
+        /// </summary>s
         public WarningValues CurrentWarningValues
         {
             get { return runningTrackerDataAccess.CurrentWarningValues; }

@@ -11,14 +11,15 @@ using Android.Runtime;
 using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using Running_Tracker.Persistence;
 
 namespace Running_Tracker.ViewActivity
 {
     [Activity(Label = "HistoryActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class HistoryActivity : BaseActivity
     {
-        private List<string> mItems;
-        ArrayAdapter<string> adapter;
+        private List<RunningData> mItems;
+        ArrayAdapter<RunningData> adapter;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -33,14 +34,9 @@ namespace Running_Tracker.ViewActivity
 
             //Listview beállítása
             ListView mListVIew = FindViewById<ListView>(Resource.Id.myListView);
-            mItems = new List<string>
-            {
-                "First",
-                "Second",
-                "Third"
-            };
+            mItems = model.LoadPreviousRunnings();
 
-            adapter = new ArrayAdapter<string>(this, Android.Resource.Layout.SimpleListItem1, mItems);
+            adapter = new ArrayAdapter<RunningData>(this, Android.Resource.Layout.SimpleListItem1, mItems);
             mListVIew.Adapter = adapter;
             mListVIew.ItemClick += MListVIew_ItemClick;
             mListVIew.ItemLongClick += MListVIew_ItemLongClick;

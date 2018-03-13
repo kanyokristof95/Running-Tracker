@@ -65,7 +65,7 @@ namespace Running_Tracker.ViewActivity
             //eseménykezelő
             model.GPS_Ready += Model_GPS_Ready;
             model.NewPosition += Model_NewPosition;
-            model.CurrentTimeSpan += Model_CurrentTimeSpan;
+            model.CurrentRunningDuration += Model_CurrentTimeSpan;
             model.Warning += Model_Warning;
 
             //inicializáció

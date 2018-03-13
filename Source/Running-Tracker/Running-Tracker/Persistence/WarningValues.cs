@@ -2,13 +2,19 @@
 
 namespace Running_Tracker.Persistence
 {
+    /// <summary>
+    /// Contains the warning values
+    /// </summary>
     public class WarningValues
     {
         /// <summary>
-        /// In meter
+        /// Warn if the distance of running is more then this property.
         /// </summary>
         public double Distance { get; set; }
 
+        /// <summary>
+        /// Warn if the distance of running is more then this property.
+        /// </summary>
         public TimeSpan Time { get; set; }
 
         /// <summary>

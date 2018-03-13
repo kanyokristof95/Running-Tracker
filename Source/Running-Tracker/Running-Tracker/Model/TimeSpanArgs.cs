@@ -2,6 +2,9 @@
 
 namespace Running_Tracker.Model
 {
+    /// <summary>
+    /// Contains the current running time.
+    /// </summary>
     public class TimeSpanArgs : EventArgs
     {
         private TimeSpan timeSpan;

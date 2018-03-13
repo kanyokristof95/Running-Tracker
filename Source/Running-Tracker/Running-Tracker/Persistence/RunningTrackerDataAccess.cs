@@ -7,10 +7,16 @@ using Newtonsoft.Json;
 
 namespace Running_Tracker.Persistence
 {
+    /// <summary>
+    /// Data access for Running Tracker App.
+    /// </summary>
     class RunningTrackerDataAccess : IRunningTrackerDataAccess
     {
         public RunningTrackerDataAccess() {}
-        
+
+        /// <summary>
+        /// Returns the previous saved runnings.
+        /// </summary>
         public List<RunningData> LoadPreviousRunnings()
         {
             ISharedPreferences runningTracker = Application.Context.GetSharedPreferences("RunningTracker", FileCreationMode.Private);
@@ -32,6 +38,9 @@ namespace Running_Tracker.Persistence
             return runnings;
         }
 
+        /// <summary>
+        /// Save the running in the parameter.
+        /// </summary>
         public void SaveRunning(RunningData running)
         {
             ISharedPreferences runningTracker = Application.Context.GetSharedPreferences("RunningTracker", FileCreationMode.Private);
@@ -51,6 +60,9 @@ namespace Running_Tracker.Persistence
             runningTrackerEditor.Commit();
         }
 
+        /// <summary>
+        /// Delete the running in the parameter.
+        /// </summary>
         public void DeleteRunning(RunningData running)
         {
             ISharedPreferences runningTracker = Application.Context.GetSharedPreferences("RunningTracker", FileCreationMode.Private);
@@ -69,7 +81,10 @@ namespace Running_Tracker.Persistence
             runningTrackerEditor.PutStringSet("Runnings", runningsString);
             runningTrackerEditor.Commit();
         }
-        
+
+        /// <summary>
+        /// Property for the current personal datas.
+        /// </summary>
         public PersonalDatas CurrentPersonalDatas
         {
             get
@@ -99,6 +114,9 @@ namespace Running_Tracker.Persistence
             }
         }
 
+        /// <summary>
+        /// Property for the current warning values.
+        /// </summary>
         public WarningValues CurrentWarningValues
         {
             get
