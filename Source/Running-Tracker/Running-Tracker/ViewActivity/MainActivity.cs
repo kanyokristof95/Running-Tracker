@@ -60,13 +60,7 @@ namespace Running_Tracker.ViewActivity
             //view-n lévő vezérlők megkeresése
             speedTextView = FindViewById<TextView>(Resource.Id.speed);
             distanceTextView = FindViewById<TextView>(Resource.Id.distance);
-            
-
-            //eseménykezelő
-            model.GPS_Ready += Model_GPS_Ready;
-            model.NewPosition += Model_NewPosition;
-            model.CurrentRunningDuration += Model_CurrentTimeSpan;
-            model.Warning += Model_Warning;
+           
 
             //inicializáció
             MainButtonState = MainButtonStates.Calibrating;
@@ -106,6 +100,31 @@ namespace Running_Tracker.ViewActivity
             }
 
             _mapFragment.GetMapAsync(this);
+        }
+
+        private void Model_UserPosition(object sender, Model.PositionArgs e)
+        {
+            Toast.MakeText(this, "TEST2", ToastLength.Long).Show();
+            //térképen user a középpontban
+            LatLng location = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
+            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+            builder.Target(location);
+            builder.Zoom(16);
+            CameraPosition cameraPosition = builder.Build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+
+            _map.MoveCamera(cameraUpdate);
+
+            //user kirajzolása
+            _map.Clear();
+              CircleOptions circleOptions = new CircleOptions();
+              circleOptions.InvokeCenter(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+              circleOptions.InvokeRadius(9);
+              circleOptions.InvokeStrokeColor(Color.White);
+              circleOptions.InvokeFillColor(Color.Rgb(69, 140, 228));
+              circleOptions.InvokeStrokeWidth(2);
+
+              _map.AddCircle(circleOptions);
         }
 
         private void Model_Warning(object sender, Model.WarningArgs e)
@@ -182,6 +201,16 @@ namespace Running_Tracker.ViewActivity
 
             _map.AddCircle(circleOptions);
 
+            //camera on user position
+            LatLng location = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
+            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+            builder.Target(location);
+            builder.Zoom(16);
+            CameraPosition cameraPosition = builder.Build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+
+            _map.MoveCamera(cameraUpdate);
+
         }
 
         private void Model_GPS_Ready(object sender, Model.PositionArgs e)
@@ -196,8 +225,8 @@ namespace Running_Tracker.ViewActivity
             _map.MoveCamera(cameraUpdate);
 
            if(MainButtonState == MainButtonStates.Calibrating){ 
-            mainButton.Text = "Start";
-            MainButtonState = MainButtonStates.Start;
+                mainButton.Text = "Start";
+                MainButtonState = MainButtonStates.Start;
             }
         }
         
@@ -211,6 +240,8 @@ namespace Running_Tracker.ViewActivity
                     Toast.MakeText(this, "GPS calibration in progress, please wait.", ToastLength.Long).Show();
                     break;
                 case MainButtonStates.Start:
+                    model.UserPosition -= Model_UserPosition;
+                    _map.Clear();
                     distanceTextView.Text = "0";
                     MainButtonState = MainButtonStates.Stop;
                     mainButton.Text = "Stop";
@@ -237,13 +268,19 @@ namespace Running_Tracker.ViewActivity
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
             _map.MoveCamera(cameraUpdate);
-            
+
+            //eseménykezelő
+            model.CurrentRunningDuration += Model_CurrentTimeSpan;
+            model.Warning += Model_Warning;
+            model.UserPosition += Model_UserPosition;
+            model.GPS_Ready += Model_GPS_Ready;
+            model.NewPosition += Model_NewPosition;
         }
         private void drawCircle(LatLng circleCenter)
         {
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.InvokeCenter(circleCenter);
-            circleOptions.InvokeRadius(35);
+            circleOptions.InvokeRadius(25);
             circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
             circleOptions.InvokeStrokeColor(Color.Black);
             circleOptions.InvokeStrokeWidth(1);
