@@ -8,37 +8,37 @@
         /// <summary>
         /// The current speed in km/h.
         /// </summary>
-        public double Speed { get; private set; }
+        public double Speed { get; set; }
 
         /// <summary>
         /// The current latitude.
         /// </summary>
-        public double Latitude { get; private set; }
+        public double Latitude { get; set; }
 
         /// <summary>
         /// The current longitude.
         /// </summary>
-        public double Longitude { get; private set; }
+        public double Longitude { get; set; }
         
         /// <summary>
         /// The distance from the previous location in meter.
         /// </summary>
-        public double Distance { get; private set; }
+        public double Distance { get; set; }
 
         /// <summary>
         /// The vertical up distance from the previous location in meter.
         /// </summary>
-        public double Up { get; private set; }
+        public double Up { get; set; }
 
         /// <summary>
         /// The vertical down distance from the previous location in meter.
         /// </summary>
-        public double Down { get; private set; }
+        public double Down { get; set; }
 
         /// <summary>
         /// The type of running at the current location.
         /// </summary>
-        public RunningSpeed RunningSpeedType { get; private set; }
+        public RunningSpeed RunningSpeedType { get; set; }
         
         public LocationData(double longitude, double latitude, double speed = 0, double distance = 0, double up = 0, double down = 0, RunningSpeed runningSpeed = RunningSpeed.Unknown)
         {

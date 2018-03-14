@@ -48,15 +48,18 @@ namespace Running_Tracker.Model
             get { return 0; }
         }
 
+
+        public const bool debug = false;
+
         /// <summary>
         /// The number of position calibrating.
         /// </summary>
-        public const int DefaultCalibratingPosition = 10;
+        public const int DefaultCalibratingPosition = (debug) ? 1 : 10; // TODO 10
 
         /// <summary>
         /// The minimum accuracy of gps signal.
         /// </summary>
-        public const double DefaultGpsAccuracy = 6;
+        public const double DefaultGpsAccuracy = (debug) ? 60 : 6; // TODO 6
 
         /// <summary>
         /// Speed of slow running in km/h
@@ -136,11 +139,14 @@ namespace Running_Tracker.Model
                     OnGPS_Ready(new LocationData(location.Longitude, location.Latitude));
             } else
             {
-                // The gps is calibrated
+                if (location.Accuracy > DefaultGpsAccuracy)
+                    return;
+
+                    // The gps is calibrated
                 if (runningData == null)
                 {
                     // The running is not started
-                    OnUserPosition(new LocationData(location.Longitude, location.Longitude));
+                    OnUserPosition(new LocationData(location.Longitude, location.Latitude));
                     return;
                 }
 
@@ -159,94 +165,91 @@ namespace Running_Tracker.Model
 
                 // If the user's position is not changed do nothing 
                 if (previousLocation != null && previousLocation.Speed == 0 && location.Speed == 0) return;
+                
+                previousLocation = currentLocation;
+                currentLocation = location;
 
-                // Check the accuracy
-                if (location.Accuracy <= DefaultGpsAccuracy)
+                double distance = 0;
+                double verticalDistance = 0;
+
+                if (previousLocation != null)
                 {
-                    previousLocation = currentLocation;
-                    currentLocation = location;
+                    distance = currentLocation.DistanceTo(previousLocation);
+                    verticalDistance = currentLocation.Altitude - previousLocation.Altitude;
+                }
 
-                    double distance = 0;
-                    double verticalDistance = 0;
+                double up = 0;
+                double down = 0;
 
-                    if (previousLocation != null)
+                if (verticalDistance > 0)
+                {
+                    up = verticalDistance;
+                } else
+                {
+                    down = -verticalDistance;
+                }
+
+                double speed = location.Speed * 3.6;
+
+                RunningSpeed runningSpeed;
+                if (previousLocation == null)
+                {
+                    runningSpeed = RunningSpeed.StartPoint;
+                } else if (speed < SlowRunning)
+                {
+                    runningSpeed = RunningSpeed.Slow;
+                } else if (speed > FastRunning)
+                {
+                    runningSpeed = RunningSpeed.Fast;
+                } else
+                {
+                    runningSpeed = RunningSpeed.Normal;
+                }
+                    
+                if (stopWarningFrequency == 0 && currentLocation.Speed == 0)
+                {
+                    stopWarningFrequency = StopWarningFrequency;
+                    runningSpeed = RunningSpeed.Stop;
+                }
+                    
+                LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
+                runningData.Add(currentLocationData);
+                    
+                OnNewPosition(currentLocationData);
+                    
+                // Send warning signals
+                if (timeWarningFrequency == 0)
+                {
+                    if (runningData.Duration > CurrentWarningValues.Time)
                     {
-                        distance = Math.Round(currentLocation.DistanceTo(previousLocation), 2);
-                        verticalDistance = currentLocation.Altitude - previousLocation.Altitude;
+                        timeWarningFrequency = TimeWarningFrequency;
+                        OnWarning(WarningType.Time);
+                    }
+                }
+
+                if(distanceWarningFrequency == 0)
+                {
+                    if (runningData.Distance > CurrentWarningValues.Distance)
+                    {
+                        distanceWarningFrequency = DistanceWarningFrequency;
+                        OnWarning(WarningType.Distance);
+                    }
+                }
+                    
+                if (speedWarningFrequency == 0)
+                {
+                    if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
+                    {
+                        speedWarningFrequency = SpeedWarningFrequency;
+                        OnWarning(WarningType.SpeedSlow);
                     }
 
-                    double up = 0;
-                    double down = 0;
-
-                    if (verticalDistance > 0)
+                    if (currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
                     {
-                        up = verticalDistance;
-                    } else
-                    {
-                        down = -verticalDistance;
-                    }
-
-                    double speed = Math.Round(location.Speed * 3.6, 2);
-
-                    RunningSpeed runningSpeed;
-                    if (previousLocation == null)
-                    {
-                        runningSpeed = RunningSpeed.StartPoint;
-                    } else if (speed < SlowRunning)
-                    {
-                        runningSpeed = RunningSpeed.Slow;
-                    } else if (speed > FastRunning)
-                    {
-                        runningSpeed = RunningSpeed.Fast;
-                    } else
-                    {
-                        runningSpeed = RunningSpeed.Normal;
+                        speedWarningFrequency = SpeedWarningFrequency;
+                        OnWarning(WarningType.SpeedFast);
                     }
                     
-                    if (stopWarningFrequency == 0 && currentLocation.Speed == 0)
-                    {
-                        stopWarningFrequency = StopWarningFrequency;
-                        runningSpeed = RunningSpeed.Stop;
-                    }
-                    
-                    LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
-                    runningData.Add(currentLocationData);
-                    
-                    OnNewPosition(currentLocationData);
-                    
-                    // Send warning signals
-                    if (timeWarningFrequency == 0)
-                    {
-                        if (runningData.Duration > CurrentWarningValues.Time)
-                        {
-                            timeWarningFrequency = TimeWarningFrequency;
-                            OnWarning(WarningType.Time);
-                        }
-                    }
-
-                    if(distanceWarningFrequency == 0)
-                    {
-                        if (runningData.Distance > CurrentWarningValues.Distance)
-                        {
-                            distanceWarningFrequency = DistanceWarningFrequency;
-                            OnWarning(WarningType.Distance);
-                        }
-                    }
-                    
-                    if (speedWarningFrequency == 0)
-                    {
-                        if (currentLocation.Speed * 3.6 < CurrentWarningValues.MinimumSpeed)
-                        {
-                            speedWarningFrequency = SpeedWarningFrequency;
-                            OnWarning(WarningType.SpeedSlow);
-                        }
-
-                        if (currentLocation.Speed * 3.6 > CurrentWarningValues.MaximumSpeed)
-                        {
-                            speedWarningFrequency = SpeedWarningFrequency;
-                            OnWarning(WarningType.SpeedFast);
-                        }
-                    }
                 }
             }
         }
@@ -286,9 +289,9 @@ namespace Running_Tracker.Model
             if(runningData != null)
             {
                 runningData.Finish();
-                runningData = null;
                 runningTimer.Stop();
                 SaveRunning(runningData);
+                runningData = null;
             }
         }
         

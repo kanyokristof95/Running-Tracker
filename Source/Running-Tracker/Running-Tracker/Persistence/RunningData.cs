@@ -8,41 +8,55 @@ namespace Running_Tracker.Persistence
     /// </summary>
     public class RunningData
     {
-        private List<LocationData> locationList;
-        private PersonalDatas personalDatas;
-        private bool open;
-        private double distance;
-
-        private double minLongitude;
-        private double maxLongitude;
-        private double minLatitude;
-        private double maxLatitude;
-
         /// <summary>
         /// Locations of the running.
         /// </summary>
-        public List<LocationData> Locations
-        {
-            get { return locationList; }
-        }
+        public List<LocationData> Locations { get; set; }
+        
+        /// <summary>
+        /// The runner's personal datas
+        /// </summary>
+        public PersonalDatas PersonalInformation { get; set; }
+        
+        /// <summary>
+        /// Is the running open
+        /// </summary>
+        public bool Open { get; set; }
 
         /// <summary>
         /// The running's distance in meter.
         /// </summary>
-        public double Distance
-        {
-            get { return distance; }
-        }
+        public double Distance { get; set; }
 
         /// <summary>
         /// The start date of running.
         /// </summary>
-        public DateTime StartDateTime { get; private set; }
+        public DateTime StartDateTime { get; set; }
 
         /// <summary>
         /// The end date of running.
         /// </summary>
-        public DateTime EndDateTime { get; private set; }
+        public DateTime EndDateTime { get; set; }
+        
+        /// <summary>
+        /// The min longitude of running
+        /// </summary>
+        public double MinLongitude { get; set; }
+
+        /// <summary>
+        /// The max langitude of running
+        /// </summary>
+        public double MaxLongitude { get; set; }
+
+        /// <summary>
+        /// The min latitude of running
+        /// </summary>
+        public double MinLatitude { get; set; }
+
+        /// <summary>
+        /// The max latitude of running
+        /// </summary>
+        public double MaxLatitude { get; set; }
 
         /// <summary>
         /// The duration of running.
@@ -51,10 +65,11 @@ namespace Running_Tracker.Persistence
         {
             get
             {
-                if(open)
+                if (Open)
                 {
                     return DateTime.Now - StartDateTime;
-                } else
+                }
+                else
                 {
                     return EndDateTime - StartDateTime;
                 }
@@ -78,7 +93,7 @@ namespace Running_Tracker.Persistence
             {
                 double temp = 0;
 
-                foreach (LocationData data in locationList)
+                foreach (LocationData data in Locations)
                 {
                     temp += data.Up;
                 }
@@ -96,7 +111,7 @@ namespace Running_Tracker.Persistence
             {
                 double temp = 0;
 
-                foreach (LocationData data in locationList)
+                foreach (LocationData data in Locations)
                 {
                     temp += data.Down;
                 }
@@ -113,54 +128,22 @@ namespace Running_Tracker.Persistence
             get
             {
                 double calcCoefficient = 0.790; // Running - 0.790, Biking - 0.28, Swimming - 2.93
-                return calcCoefficient * personalDatas.Weight * 2.2046 * Distance / 1609.344;
+                return calcCoefficient * PersonalInformation.Weight * 2.2046 * Distance / 1609.344;
             }
-        }
-
-        /// <summary>
-        /// The min longitude of running
-        /// </summary>
-        public double MinLongitude
-        {
-            get { return minLongitude; }
-        }
-
-        /// <summary>
-        /// The max langitude of running
-        /// </summary>
-        public double MaxLongitude
-        {
-            get { return maxLongitude; }
-        }
-
-        /// <summary>
-        /// The min latitude of running
-        /// </summary>
-        public double MinLatitude
-        {
-            get { return minLatitude; }
-        }
-
-        /// <summary>
-        /// The max latitude of running
-        /// </summary>
-        public double MaxLatitude
-        {
-            get { return maxLatitude; }
         }
 
         public RunningData(PersonalDatas personalDatas)
         {
-            open = true;
-            distance = 0;
+            Open = true;
+            Distance = 0;
 
-            minLongitude = double.PositiveInfinity;
-            maxLongitude = double.NegativeInfinity;
-            minLatitude = double.PositiveInfinity;
-            maxLatitude = double.NegativeInfinity;
+            MinLongitude = double.PositiveInfinity;
+            MaxLongitude = double.NegativeInfinity;
+            MinLatitude = double.PositiveInfinity;
+            MaxLatitude = double.NegativeInfinity;
 
-            this.personalDatas = personalDatas;
-            locationList = new List<LocationData>();
+            PersonalInformation = personalDatas;
+            Locations = new List<LocationData>();
             StartDateTime = DateTime.Now;
         }
 
@@ -169,22 +152,22 @@ namespace Running_Tracker.Persistence
         /// </summary>
         public void Add(LocationData location)
         {
-            if (open)
+            if (Open)
             {
-                if (location.Longitude < minLongitude)
-                    minLongitude = location.Longitude;
+                if (location.Longitude < MinLongitude)
+                    MinLongitude = location.Longitude;
 
-                if (location.Longitude > maxLongitude)
-                    maxLongitude = location.Longitude;
+                if (location.Longitude > MaxLongitude)
+                    MaxLongitude = location.Longitude;
 
-                if (location.Latitude < minLatitude)
-                    minLatitude = location.Latitude;
+                if (location.Latitude < MinLatitude)
+                    MinLatitude = location.Latitude;
 
-                if (location.Latitude > maxLatitude)
-                    maxLatitude = location.Latitude;
+                if (location.Latitude > MaxLatitude)
+                    MaxLatitude = location.Latitude;
 
-                distance += location.Distance;
-                locationList.Add(location);
+                Distance += location.Distance;
+                Locations.Add(location);
             }
         }
 
@@ -193,10 +176,10 @@ namespace Running_Tracker.Persistence
         /// </summary>
         public void Finish()
         {
-            if (open)
+            if (Open)
             {
                 EndDateTime = DateTime.Now;
-                open = false;
+                Open = false;
             }
         }
 

@@ -30,8 +30,7 @@ namespace Running_Tracker.ViewActivity
 
         GoogleMap _map;
         MapFragment _mapFragment;
-
-        int hour, min, sec;
+        
         TextView txtTime;
 
         private Button mainButton;
@@ -75,10 +74,6 @@ namespace Running_Tracker.ViewActivity
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Running Tracker";
 
-            //timer
-            hour = 0;
-            min = 0;
-            sec = 0;
             mainButton = FindViewById<Button>(Resource.Id.mainButton);
             txtTime = FindViewById<TextView>(Resource.Id.txtTimer);
             mainButton.Click += MainButton_Clicked;
@@ -102,29 +97,13 @@ namespace Running_Tracker.ViewActivity
             _mapFragment.GetMapAsync(this);
         }
 
+       
+
         private void Model_UserPosition(object sender, Model.PositionArgs e)
         {
-            Toast.MakeText(this, "TEST2", ToastLength.Long).Show();
-            //térképen user a középpontban
-            LatLng location = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(16);
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-
-            _map.MoveCamera(cameraUpdate);
-
-            //user kirajzolása
             _map.Clear();
-              CircleOptions circleOptions = new CircleOptions();
-              circleOptions.InvokeCenter(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
-              circleOptions.InvokeRadius(9);
-              circleOptions.InvokeStrokeColor(Color.White);
-              circleOptions.InvokeFillColor(Color.Rgb(69, 140, 228));
-              circleOptions.InvokeStrokeWidth(2);
-
-              _map.AddCircle(circleOptions);
+            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            //MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
         }
 
         private void Model_Warning(object sender, Model.WarningArgs e)
@@ -152,9 +131,9 @@ namespace Running_Tracker.ViewActivity
 
         private void Model_CurrentTimeSpan(object sender, Model.TimeSpanArgs e)
         {
-            hour = e.Time.Hours;
-            min = e.Time.Minutes;
-            sec = e.Time.Seconds;
+            int hour = e.Time.Hours;
+            int min = e.Time.Minutes;
+            int sec = e.Time.Seconds;
 
             RunOnUiThread(() =>
             {
@@ -165,11 +144,11 @@ namespace Running_Tracker.ViewActivity
         private void Model_NewPosition(object sender, Model.PositionArgs e)
         {
             //speed refresh
-            speedTextView.Text = e.LocationData.Speed.ToString();
+            speedTextView.Text = Math.Round(e.LocationData.Speed, 2).ToString();
 
             //distance refresh
             sumDistance = sumDistance + e.LocationData.Distance;
-            distanceTextView.Text = sumDistance.ToString();
+            distanceTextView.Text = Math.Round(sumDistance, 2).ToString();
 
             // map refresh
             _map.Clear();
@@ -188,43 +167,21 @@ namespace Running_Tracker.ViewActivity
 
             foreach (var circle in circles)
             {
-                drawCircle(circle);
+                DrawCircle(circle, 25, Color.Rgb(213, 52, 58), Color.Black, 1);
             }
-
-            //user current position
-            CircleOptions circleOptions = new CircleOptions();
-            circleOptions.InvokeCenter(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
-            circleOptions.InvokeRadius(9);
-            circleOptions.InvokeStrokeColor(Color.White);
-            circleOptions.InvokeFillColor(Color.Rgb(69, 140, 228));
-            circleOptions.InvokeStrokeWidth(2);
-
-            _map.AddCircle(circleOptions);
-
-            //camera on user position
-            LatLng location = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(16);
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-
-            _map.MoveCamera(cameraUpdate);
-
+            
+            // User's positon
+            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            //MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
         }
 
         private void Model_GPS_Ready(object sender, Model.PositionArgs e)
         {
-            LatLng location = new LatLng(e.LocationData.Latitude,e.LocationData.Longitude);
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(16);
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+            _map.Clear();
+            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
 
-            _map.MoveCamera(cameraUpdate);
-
-           if(MainButtonState == MainButtonStates.Calibrating){ 
+            if (MainButtonState == MainButtonStates.Calibrating){ 
                 mainButton.Text = "Start";
                 MainButtonState = MainButtonStates.Start;
             }
@@ -259,15 +216,8 @@ namespace Running_Tracker.ViewActivity
         public void OnMapReady(GoogleMap map)
         {
             _map = map;
-
-            LatLng location = new LatLng(47.162494, 19.503304);
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(6);
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-
-            _map.MoveCamera(cameraUpdate);
+            
+            MoveCamera(new LatLng(47.162494, 19.503304), 6);
 
             //eseménykezelő
             model.CurrentRunningDuration += Model_CurrentTimeSpan;
@@ -276,18 +226,30 @@ namespace Running_Tracker.ViewActivity
             model.GPS_Ready += Model_GPS_Ready;
             model.NewPosition += Model_NewPosition;
         }
-        private void drawCircle(LatLng circleCenter)
+
+        private void MoveCamera(LatLng location, float zoom = 16)
+        {
+            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
+            builder.Target(location);
+            builder.Zoom(zoom);
+            CameraPosition cameraPosition = builder.Build();
+            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+
+            _map.MoveCamera(cameraUpdate);
+        }
+
+        private void DrawCircle(LatLng circleCenter, int radius, Color fillColor, Color strokeColor, int strokeWidth)
         {
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.InvokeCenter(circleCenter);
-            circleOptions.InvokeRadius(25);
-            circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
-            circleOptions.InvokeStrokeColor(Color.Black);
-            circleOptions.InvokeStrokeWidth(1);
+            circleOptions.InvokeRadius(radius);
+            circleOptions.InvokeFillColor(fillColor);
+            circleOptions.InvokeStrokeColor(strokeColor);
+            circleOptions.InvokeStrokeWidth(strokeWidth);
 
             _map.AddCircle(circleOptions);
         }
-            private void gpsSettings()
+        private void gpsSettings()
         {
             locationManager = (LocationManager)GetSystemService(LocationService);
 
