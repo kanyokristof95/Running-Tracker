@@ -8,10 +8,10 @@ using Android.Runtime;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using System;
-using System.Timers;
 using System.Collections.Generic;
 using Android.Graphics;
 using Android.Content.PM;
+using Running_Tracker.Model;
 
 namespace Running_Tracker.ViewActivity
 {
@@ -25,14 +25,14 @@ namespace Running_Tracker.ViewActivity
             Stop
         }
 
-        public MainButtonStates MainButtonState{ get; set; }
-        
+        public MainButtonStates MainButtonState { get; set; }
 
-        GoogleMap _map;
-        MapFragment _mapFragment;
-        
-        TextView txtTime;
+        private GoogleMap _map;
+        private MapFragment _mapFragment;
+        private LatLng lastUserPosition;
 
+        private TextView txtTime;
+   
         private Button mainButton;
 
         private LocationManager locationManager;
@@ -66,7 +66,7 @@ namespace Running_Tracker.ViewActivity
             sumDistance = 0;
             lines = new List<LatLng>();
             circles = new List<LatLng>();
-            rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+            rectOptions = new PolylineOptions().InvokeColor(Color.Red).InvokeZIndex(5);
 
 
             //toolbar
@@ -99,37 +99,38 @@ namespace Running_Tracker.ViewActivity
 
        
 
-        private void Model_UserPosition(object sender, Model.PositionArgs e)
+        private void Model_UserPosition(object sender, PositionArgs e)
         {
             _map.Clear();
-            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            //MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
+            DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            MoveCamera(lastUserPosition);
         }
 
-        private void Model_Warning(object sender, Model.WarningArgs e)
+        private void Model_Warning(object sender, WarningArgs e)
         {
             Vibrator vibrator = (Vibrator) GetSystemService(VibratorService);
-            vibrator.Vibrate(100);
+            vibrator.Vibrate(500);
 
             switch (e.Warning)
             {
-                case Model.WarningType.Distance:
+                case WarningType.Distance:
                     Toast.MakeText(this, "You reached the required distance.", ToastLength.Long).Show();
                     break;
-                case Model.WarningType.SpeedFast:
+                case WarningType.SpeedFast:
                     Toast.MakeText(this, "You are too fast.", ToastLength.Long).Show();
                     break;
-                case Model.WarningType.SpeedSlow:
+                case WarningType.SpeedSlow:
                     Toast.MakeText(this, "You are too slow.", ToastLength.Long).Show();
                     break;
-                case Model.WarningType.Time:
+                case WarningType.Time:
                     Toast.MakeText(this, "You reached the required time.", ToastLength.Long).Show();
                     break;
             }
         }
 
 
-        private void Model_CurrentTimeSpan(object sender, Model.TimeSpanArgs e)
+        private void Model_CurrentTimeSpan(object sender, TimeSpanArgs e)
         {
             int hour = e.Time.Hours;
             int min = e.Time.Minutes;
@@ -141,8 +142,10 @@ namespace Running_Tracker.ViewActivity
             });
         }
 
-        private void Model_NewPosition(object sender, Model.PositionArgs e)
+        private void Model_NewPosition(object sender, PositionArgs e)
         {
+            lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
+
             //speed refresh
             speedTextView.Text = Math.Round(e.LocationData.Speed, 2).ToString();
 
@@ -154,34 +157,40 @@ namespace Running_Tracker.ViewActivity
             _map.Clear();
             if (e.LocationData.RunningSpeedType == Persistence.RunningSpeed.Stop)
             {
-                Toast.MakeText(this, "TEST", ToastLength.Long).Show();
-                circles.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+                circles.Add(lastUserPosition);
             }
             else
             {
-                lines.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+                lines.Add(lastUserPosition);
                 rectOptions.Add(lines[lines.Count - 1]);
             }
+
+            // Medium speed's color
+            rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
+
             //draw
             _map.AddPolyline(rectOptions);
 
             foreach (var circle in circles)
             {
-                DrawCircle(circle, 25, Color.Rgb(213, 52, 58), Color.Black, 1);
+                DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1);
             }
             
             // User's positon
-            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            //MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            MoveCamera(lastUserPosition);
         }
 
-        private void Model_GPS_Ready(object sender, Model.PositionArgs e)
+        private void Model_GPS_Ready(object sender, PositionArgs e)
         {
             _map.Clear();
+
+            lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
             DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
             MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
 
-            if (MainButtonState == MainButtonStates.Calibrating){ 
+            if (!model.IsRunning)
+            {
                 mainButton.Text = "Start";
                 MainButtonState = MainButtonStates.Start;
             }
@@ -197,20 +206,32 @@ namespace Running_Tracker.ViewActivity
                     Toast.MakeText(this, "GPS calibration in progress, please wait.", ToastLength.Long).Show();
                     break;
                 case MainButtonStates.Start:
-                    model.UserPosition -= Model_UserPosition;
-                    _map.Clear();
-                    distanceTextView.Text = "0";
-                    MainButtonState = MainButtonStates.Stop;
-                    mainButton.Text = "Stop";
-                    model.StartRunning();
+                    try
+                    {
+                        model.StartRunning();
+                        model.UserPosition -= Model_UserPosition;
+                        _map.Clear();
+                        distanceTextView.Text = "0";
+                        speedTextView.Text = "0";
+                        MainButtonState = MainButtonStates.Stop;
+                        mainButton.Text = "Stop";
+                    } catch(gpsNotReadyException)
+                    {
+                        Toast.MakeText(this, "GPS is not calibrated.", ToastLength.Long).Show();
+                    }
                     break;
                 case MainButtonStates.Stop:
                     model.StopRunning();
                     MainButtonState = MainButtonStates.Start;
                     mainButton.Text = "Start";
-                    //TODO inicializálás alaphelyzetre
+                    Toast.MakeText(this, "Running is saved", ToastLength.Long).Show();
                     break;
-            }     
+            }
+
+            if(lastUserPosition != null)
+            {
+                DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2);
+            }
         }
 
         public void OnMapReady(GoogleMap map)
@@ -226,12 +247,12 @@ namespace Running_Tracker.ViewActivity
             model.GPS_Ready += Model_GPS_Ready;
             model.NewPosition += Model_NewPosition;
         }
-
+        
         private void MoveCamera(LatLng location, float zoom = 16)
         {
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
-            builder.Zoom(zoom);
+            builder.Zoom((float) zoom);
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
 
@@ -246,16 +267,17 @@ namespace Running_Tracker.ViewActivity
             circleOptions.InvokeFillColor(fillColor);
             circleOptions.InvokeStrokeColor(strokeColor);
             circleOptions.InvokeStrokeWidth(strokeWidth);
+            circleOptions.InvokeZIndex(10);
 
             _map.AddCircle(circleOptions);
         }
-        private void gpsSettings()
+        private void GpsSettings()
         {
             locationManager = (LocationManager)GetSystemService(LocationService);
 
             if (locationManager.IsProviderEnabled(LocationManager.GpsProvider) == false)
             {
-                gpsProviderDisabled();
+                GpsProviderDisabled();
             }
             else
             {
@@ -273,11 +295,17 @@ namespace Running_Tracker.ViewActivity
                 }
                 
                 locationManager.RequestLocationUpdates(locationProvider, model.GPSMinTime, model.GPSMinDistance, this);
+                
+                if (!model.IsRunning)
+                {
+                    MainButtonState = MainButtonStates.Calibrating;
+                    mainButton.Text = "Calibrating ...";
+                }
                 model.Calibrate();
             }
         }
 
-        private void gpsProviderDisabled()
+        private void GpsProviderDisabled()
         {
             var alertDialog = new Android.Support.V7.App.AlertDialog.Builder(this);
             alertDialog.SetTitle("GPS provider");
@@ -291,7 +319,7 @@ namespace Running_Tracker.ViewActivity
             {
                 // If the user start the app without gps, then the OnProviderEnabled function won't be called
                 // In this case the user has to click into the retry button
-                gpsSettings();
+                GpsSettings();
             });
 
             alertDialog.SetPositiveButton("Settings", delegate
@@ -304,7 +332,7 @@ namespace Running_Tracker.ViewActivity
             dialog.Show();
         }
 
-        private void gpsProviderEnabled()
+        private void GpsProviderEnabled()
         {
             if (dialog != null)
             {
@@ -322,12 +350,12 @@ namespace Running_Tracker.ViewActivity
 
         public void OnProviderDisabled(string provider)
         {
-            gpsProviderDisabled();
+            GpsProviderDisabled();
         }
 
         public void OnProviderEnabled(string provider)
         {
-            gpsProviderEnabled();
+            GpsProviderEnabled();
         }
 
         
@@ -337,7 +365,7 @@ namespace Running_Tracker.ViewActivity
         protected override void OnResume()
         {
             base.OnResume();
-            gpsSettings();
+            GpsSettings();
         }
 
         protected override void OnPause()

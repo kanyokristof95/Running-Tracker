@@ -25,7 +25,7 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// Property for the current personal datas.
         /// </summary>
-        PersonalDatas CurrentPersonalDatas { get; set; }
+        PersonalData CurrentPersonalDatas { get; set; }
 
         /// <summary>
         /// Property for the current warning values.

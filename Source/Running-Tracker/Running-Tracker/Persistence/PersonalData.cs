@@ -3,7 +3,7 @@
     /// <summary>
     /// Contains the user's personal datas.
     /// </summary>
-    public class PersonalDatas
+    public class PersonalData
     {
         /// <summary>
         /// Sex of user.
@@ -20,7 +20,7 @@
         /// </summary>
         public int Weight { get; set; }
 
-        public PersonalDatas(Gender sex = Gender.Male, int height = 170, int weight = 70)
+        public PersonalData(Gender sex = Gender.Male, int height = 170, int weight = 70)
         {
             Sex = sex;
             Height = height;

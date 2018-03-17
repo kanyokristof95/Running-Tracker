@@ -16,7 +16,7 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// The runner's personal datas
         /// </summary>
-        public PersonalDatas PersonalInformation { get; set; }
+        public PersonalData PersonalInformation { get; set; }
         
         /// <summary>
         /// Is the running open
@@ -132,7 +132,7 @@ namespace Running_Tracker.Persistence
             }
         }
 
-        public RunningData(PersonalDatas personalDatas)
+        public RunningData(PersonalData personalDatas)
         {
             Open = true;
             Distance = 0;

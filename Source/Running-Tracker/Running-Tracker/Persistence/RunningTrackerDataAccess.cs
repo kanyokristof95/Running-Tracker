@@ -75,7 +75,17 @@ namespace Running_Tracker.Persistence
                 runningsString = stringICollection.ToList();
             }
 
-            runningsString.Remove(JsonConvert.SerializeObject(running));
+            string runningString = JsonConvert.SerializeObject(running);
+            string deleteRunning = null;
+
+            foreach (string run in runningsString)
+            {
+                if(run.Equals(runningString))
+                {
+                    deleteRunning = run;
+                }
+            }
+            runningsString.Remove(deleteRunning);
 
             ISharedPreferencesEditor runningTrackerEditor = runningTracker.Edit();
             runningTrackerEditor.PutStringSet("Runnings", runningsString);
@@ -85,18 +95,18 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// Property for the current personal datas.
         /// </summary>
-        public PersonalDatas CurrentPersonalDatas
+        public PersonalData CurrentPersonalDatas
         {
             get
             {
                 ISharedPreferences runningTracker = Application.Context.GetSharedPreferences("RunningTracker", FileCreationMode.Private);
                 string personalDatasString = runningTracker.GetString("PersonalDatas", null);
 
-                PersonalDatas personalDatas = new PersonalDatas();
+                PersonalData personalDatas = new PersonalData();
 
                 if (personalDatasString != null)
                 {
-                    personalDatas = JsonConvert.DeserializeObject<PersonalDatas>(personalDatasString);
+                    personalDatas = JsonConvert.DeserializeObject<PersonalData>(personalDatasString);
                 }
 
                 return personalDatas;

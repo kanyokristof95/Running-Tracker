@@ -180,13 +180,13 @@
                         android:layout_height="wrap_content"
                         android:orientation="vertical">
                         <EditText
-                            android:inputType="number"
+                            android:inputType="numberDecimal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Minimum speed (km/h)"
                             android:id="@+id/minSpeed" />
                         <EditText
-                            android:inputType="number"
+                            android:inputType="numberDecimal"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
                             android:hint="Maximum speed (km/h)"

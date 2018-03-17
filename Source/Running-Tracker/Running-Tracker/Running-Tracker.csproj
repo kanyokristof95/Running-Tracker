@@ -96,13 +96,14 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Model\gpsNotReadyException.cs" />
     <Compile Include="Persistence\RunningSpeed.cs" />
     <Compile Include="Model\TimeSpanArgs.cs" />
     <Compile Include="Model\PositionArgs.cs" />
     <Compile Include="Model\WarningArgs.cs" />
     <Compile Include="Model\WarningType.cs" />
     <Compile Include="Persistence\Gender.cs" />
-    <Compile Include="Persistence\PersonalDatas.cs" />
+    <Compile Include="Persistence\PersonalData.cs" />
     <Compile Include="Persistence\WarningValues.cs" />
     <Compile Include="ViewActivity\BaseActivity.cs" />
     <Compile Include="ViewActivity\HistoryActivity.cs" />

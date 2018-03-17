@@ -19,12 +19,14 @@ namespace Running_Tracker.Model
         private Timer runningTimer;
 
         private int remaningCalibratingLocation;
-    
+
+        private bool distanceWarningYet;
+        private bool timeWarningYet;
+
         private int speedWarningFrequency;
-        private int distanceWarningFrequency;
-        private int timeWarningFrequency;
-        private int stopWarningFrequency;
-        
+
+        private int numOfContinuouslyStopsForSignal;
+
         private Location previousLocation;
         private Location currentLocation;
 
@@ -37,7 +39,7 @@ namespace Running_Tracker.Model
         /// </summary>
         public int GPSMinTime
         {
-            get { return 1000; }
+            get { return 2000; } // TODO - maybe to 1000
         }
 
         /// <summary>
@@ -54,42 +56,22 @@ namespace Running_Tracker.Model
         /// <summary>
         /// The number of position calibrating.
         /// </summary>
-        public const int DefaultCalibratingPosition = (debug) ? 1 : 10; // TODO 10
+        public const int DefaultCalibratingPosition = (debug) ? 1 : 6; // TODO - maybe to 10
 
         /// <summary>
         /// The minimum accuracy of gps signal.
         /// </summary>
-        public const double DefaultGpsAccuracy = (debug) ? 60 : 6; // TODO 6
-
-        /// <summary>
-        /// Speed of slow running in km/h
-        /// </summary>
-        public const double SlowRunning = 8;
-
-        /// <summary>
-        /// Speed of fast running in km/h
-        /// </summary>
-        public const double FastRunning = 16;
-
+        public const double DefaultGpsAccuracy = (debug) ? 60 : 6;
+        
         /// <summary>
         /// Minimum gps signal between 2 speed warning
         /// </summary>
         public const int SpeedWarningFrequency = 10;
-
+        
         /// <summary>
-        /// Minimum gps signal between 2 distance warning
+        /// Minimum gps signal to send the location as a stopping location
         /// </summary>
-        public const int DistanceWarningFrequency = 30;
-
-        /// <summary>
-        /// Minimum gps signal between 2 time warning
-        /// </summary>
-        public const int TimeWarningFrequency = 30;
-
-        /// <summary>
-        /// Minimum gps signal between 2 stop warning
-        /// </summary>
-        public const int StopWarningFrequency = 10;
+        public const int NumOfContinuouslyStopsForSignal = 5;
 
         #endregion
 
@@ -139,27 +121,24 @@ namespace Running_Tracker.Model
                     OnGPS_Ready(new LocationData(location.Longitude, location.Latitude));
             } else
             {
+                // The gps is calibrated
+
                 if (location.Accuracy > DefaultGpsAccuracy)
                     return;
 
-                    // The gps is calibrated
+                
                 if (runningData == null)
                 {
                     // The running is not started
-                    OnUserPosition(new LocationData(location.Longitude, location.Latitude));
+                    if(location.Speed > 0)
+                    {
+                        OnUserPosition(new LocationData(location.Longitude, location.Latitude));
+                        OnCameraPosition(new LocationData(location.Longitude, location.Latitude));
+                    }
                     return;
                 }
 
                 // Reduce the warning frequencies
-                if (stopWarningFrequency > 0)
-                    stopWarningFrequency--;
-
-                if (timeWarningFrequency > 0)
-                    timeWarningFrequency--;
-
-                if (distanceWarningFrequency > 0)
-                    distanceWarningFrequency--;
-
                 if (speedWarningFrequency > 0)
                     speedWarningFrequency--;
 
@@ -195,10 +174,10 @@ namespace Running_Tracker.Model
                 if (previousLocation == null)
                 {
                     runningSpeed = RunningSpeed.StartPoint;
-                } else if (speed < SlowRunning)
+                } else if (speed < CurrentWarningValues.MinimumSpeed)
                 {
                     runningSpeed = RunningSpeed.Slow;
-                } else if (speed > FastRunning)
+                } else if (speed > CurrentWarningValues.MaximumSpeed)
                 {
                     runningSpeed = RunningSpeed.Fast;
                 } else
@@ -206,10 +185,17 @@ namespace Running_Tracker.Model
                     runningSpeed = RunningSpeed.Normal;
                 }
                     
-                if (stopWarningFrequency == 0 && currentLocation.Speed == 0)
+                if (currentLocation.Speed == 0)
                 {
-                    stopWarningFrequency = StopWarningFrequency;
-                    runningSpeed = RunningSpeed.Stop;
+                    numOfContinuouslyStopsForSignal--;
+                    if (numOfContinuouslyStopsForSignal == 0)
+                    {
+                        runningSpeed = RunningSpeed.Stop;
+                        numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
+                    }
+                } else
+                {
+                    numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
                 }
                     
                 LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
@@ -218,22 +204,16 @@ namespace Running_Tracker.Model
                 OnNewPosition(currentLocationData);
                     
                 // Send warning signals
-                if (timeWarningFrequency == 0)
+                if (!timeWarningYet && runningData.Duration > CurrentWarningValues.Time)
                 {
-                    if (runningData.Duration > CurrentWarningValues.Time)
-                    {
-                        timeWarningFrequency = TimeWarningFrequency;
-                        OnWarning(WarningType.Time);
-                    }
+                    timeWarningYet = true;
+                    OnWarning(WarningType.Time);
                 }
 
-                if(distanceWarningFrequency == 0)
+                if(!distanceWarningYet && runningData.Distance > CurrentWarningValues.Distance)
                 {
-                    if (runningData.Distance > CurrentWarningValues.Distance)
-                    {
-                        distanceWarningFrequency = DistanceWarningFrequency;
-                        OnWarning(WarningType.Distance);
-                    }
+                    distanceWarningYet = true;
+                    OnWarning(WarningType.Distance);
                 }
                     
                 if (speedWarningFrequency == 0)
@@ -271,13 +251,13 @@ namespace Running_Tracker.Model
             {
                 runningData = new RunningData(CurrentPersonalDatas);
                 speedWarningFrequency = SpeedWarningFrequency;
-                distanceWarningFrequency = DistanceWarningFrequency;
-                timeWarningFrequency = TimeWarningFrequency;
-                stopWarningFrequency = StopWarningFrequency;
+                distanceWarningYet = false;
+                timeWarningYet = false;
+                numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
                 runningTimer.Start();
             } else
             {
-                OnGPS_NotReady();
+                throw new gpsNotReadyException();
             }
         }
         
@@ -304,11 +284,6 @@ namespace Running_Tracker.Model
         public event EventHandler<PositionArgs> GPS_Ready;
 
         /// <summary>
-        /// This signal is sent when the user try to start a new running but the gps is not configured.
-        /// </summary>
-        public event EventHandler GPS_NotReady;
-
-        /// <summary>
         /// This signal is sent when a new position was processed and saved by the model.
         /// </summary>
         public event EventHandler<PositionArgs> NewPosition;
@@ -317,6 +292,12 @@ namespace Running_Tracker.Model
         /// This signal is sent when the running is not started. It contains the user's latest position.
         /// </summary>
         public event EventHandler<PositionArgs> UserPosition;
+
+
+        /// <summary>
+        /// This signal contains the new camera position
+        /// </summary>
+        public event EventHandler<PositionArgs> CameraPosition;
 
         /// <summary>
         /// This signal is sent continously during the running. It contains the duration of current running.
@@ -339,6 +320,11 @@ namespace Running_Tracker.Model
             UserPosition?.Invoke(this, new PositionArgs(location));
         }
 
+        private void OnCameraPosition(LocationData location)
+        {
+            CameraPosition?.Invoke(this, new PositionArgs(location));
+        }
+
         private void OnCurrentRunningDuration(TimeSpan timeSpan)
         {
             CurrentRunningDuration?.Invoke(this, new TimeSpanArgs(timeSpan));
@@ -348,12 +334,7 @@ namespace Running_Tracker.Model
         {
             Warning?.Invoke(this, new WarningArgs(warning));
         }
-
-        private void OnGPS_NotReady()
-        {
-            GPS_NotReady?.Invoke(this, EventArgs.Empty);
-        }
-
+        
         private void OnGPS_Ready(LocationData location)
         {
             GPS_Ready?.Invoke(this, new PositionArgs(location));
@@ -402,7 +383,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Property for the current personal datas.
         /// </summary>
-        public PersonalDatas CurrentPersonalDatas
+        public PersonalData CurrentPersonalDatas
         {
             get { return runningTrackerDataAccess.CurrentPersonalDatas; }
             set { runningTrackerDataAccess.CurrentPersonalDatas = value; }
@@ -415,6 +396,11 @@ namespace Running_Tracker.Model
         {
             get { return runningTrackerDataAccess.CurrentWarningValues; }
             set { runningTrackerDataAccess.CurrentWarningValues = value; }
+        }
+
+        public bool IsRunning
+        {
+            get { return runningData != null; }
         }
 
         #endregion
