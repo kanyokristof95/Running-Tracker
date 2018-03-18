@@ -39,7 +39,7 @@ namespace Running_Tracker.Model
         /// </summary>
         public int GPSMinTime
         {
-            get { return 2000; } // TODO - maybe to 1000
+            get { return 500; } // TODO - maybe to 1000
         }
 
         /// <summary>
@@ -56,7 +56,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// The number of position calibrating.
         /// </summary>
-        public const int DefaultCalibratingPosition = (debug) ? 1 : 6; // TODO - maybe to 10
+        public const int DefaultCalibratingPosition = (debug) ? 1 : 8; // TODO - maybe to 10
 
         /// <summary>
         /// The minimum accuracy of gps signal.
@@ -71,7 +71,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Minimum gps signal to send the location as a stopping location
         /// </summary>
-        public const int NumOfContinuouslyStopsForSignal = 5;
+        public const int NumOfContinuouslyStopsForSignal = 8;
 
         #endregion
 
@@ -125,7 +125,6 @@ namespace Running_Tracker.Model
 
                 if (location.Accuracy > DefaultGpsAccuracy)
                     return;
-
                 
                 if (runningData == null)
                 {
@@ -142,8 +141,27 @@ namespace Running_Tracker.Model
                 if (speedWarningFrequency > 0)
                     speedWarningFrequency--;
 
+
+                if (location.Speed == 0)
+                {
+                    if (numOfContinuouslyStopsForSignal >= 0)
+                    {
+                        // If the var was 0 that will be -1, so the signal won't be sent again
+                        numOfContinuouslyStopsForSignal--;
+                    }
+
+                    if (numOfContinuouslyStopsForSignal == 0)
+                    {
+                        OnUserStopped(new LocationData(location.Longitude, location.Latitude, 0, 0, 0, 0, RunningSpeed.Slow));
+                    }
+                }
+                else
+                {
+                    numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
+                }
+
                 // If the user's position is not changed do nothing 
-                if (previousLocation != null && previousLocation.Speed == 0 && location.Speed == 0) return;
+                if (previousLocation != null && location.Speed == 0) return;
                 
                 previousLocation = currentLocation;
                 currentLocation = location;
@@ -183,19 +201,6 @@ namespace Running_Tracker.Model
                 } else
                 {
                     runningSpeed = RunningSpeed.Normal;
-                }
-                    
-                if (currentLocation.Speed == 0)
-                {
-                    numOfContinuouslyStopsForSignal--;
-                    if (numOfContinuouslyStopsForSignal == 0)
-                    {
-                        runningSpeed = RunningSpeed.Stop;
-                        numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
-                    }
-                } else
-                {
-                    numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
                 }
                     
                 LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
@@ -293,6 +298,10 @@ namespace Running_Tracker.Model
         /// </summary>
         public event EventHandler<PositionArgs> UserPosition;
 
+        /// <summary>
+        /// This signal is sent when the running is not started. It contains the user's latest position.
+        /// </summary>
+        public event EventHandler<PositionArgs> UserStopped;
 
         /// <summary>
         /// This signal contains the new camera position
@@ -318,6 +327,11 @@ namespace Running_Tracker.Model
         private void OnUserPosition(LocationData location)
         {
             UserPosition?.Invoke(this, new PositionArgs(location));
+        }
+
+        private void OnUserStopped(LocationData location)
+        {
+            UserStopped?.Invoke(this, new PositionArgs(location));
         }
 
         private void OnCameraPosition(LocationData location)

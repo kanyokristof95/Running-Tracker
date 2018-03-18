@@ -17,9 +17,7 @@ namespace Running_Tracker.Persistence
     /// </summary>
     public enum RunningSpeed
     {
-        Unknown,
         StartPoint,
-        Stop,
         Slow,
         Normal,
         Fast

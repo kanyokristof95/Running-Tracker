@@ -40,7 +40,7 @@
         /// </summary>
         public RunningSpeed RunningSpeedType { get; set; }
         
-        public LocationData(double longitude, double latitude, double speed = 0, double distance = 0, double up = 0, double down = 0, RunningSpeed runningSpeed = RunningSpeed.Unknown)
+        public LocationData(double longitude, double latitude, double speed = 0, double distance = 0, double up = 0, double down = 0, RunningSpeed runningSpeed = RunningSpeed.Normal)
         {
             Speed = speed;
             Longitude = longitude;

@@ -104,7 +104,7 @@ namespace Running_Tracker.ViewActivity
             _map.Clear();
             lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
             DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            MoveCamera(lastUserPosition);
+            MoveCamera(lastUserPosition, null);
         }
 
         private void Model_Warning(object sender, WarningArgs e)
@@ -154,31 +154,30 @@ namespace Running_Tracker.ViewActivity
             distanceTextView.Text = Math.Round(sumDistance, 2).ToString();
 
             // map refresh
-            _map.Clear();
-            if (e.LocationData.RunningSpeedType == Persistence.RunningSpeed.Stop)
-            {
-                circles.Add(lastUserPosition);
-            }
-            else
-            {
-                lines.Add(lastUserPosition);
-                rectOptions.Add(lines[lines.Count - 1]);
-            }
+
+            lines.Add(lastUserPosition);
+            rectOptions.Add(lines[lines.Count - 1]);
 
             // Medium speed's color
             rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
 
             //draw
+            DrawMap();
+            MoveCamera(lastUserPosition, null);
+        }
+
+        private void DrawMap()
+        {
+            _map.Clear();
             _map.AddPolyline(rectOptions);
 
             foreach (var circle in circles)
             {
-                DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1);
+                DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1, 10);
             }
-            
+
             // User's positon
-            DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            MoveCamera(lastUserPosition);
+            DrawCircle(lastUserPosition, 9, Color.Rgb(69, 140, 228), Color.White, 2, 11);
         }
 
         private void Model_GPS_Ready(object sender, PositionArgs e)
@@ -187,7 +186,7 @@ namespace Running_Tracker.ViewActivity
 
             lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
             DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 16);
 
             if (!model.IsRunning)
             {
@@ -246,20 +245,33 @@ namespace Running_Tracker.ViewActivity
             model.UserPosition += Model_UserPosition;
             model.GPS_Ready += Model_GPS_Ready;
             model.NewPosition += Model_NewPosition;
+            model.UserStopped += Model_UserStopped;
         }
-        
-        private void MoveCamera(LatLng location, float zoom = 16)
+
+        private void Model_UserStopped(object sender, PositionArgs e)
+        {
+            circles.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
+            DrawMap();
+        }
+
+        private void MoveCamera(LatLng location, float? zoom)
         {
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
-            builder.Zoom((float) zoom);
+
+            if (zoom != null)
+                builder.Zoom((float)zoom);
+            else
+                builder.Zoom(_map.CameraPosition.Zoom);
+
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-
-            _map.MoveCamera(cameraUpdate);
+            
+            _map.AnimateCamera(cameraUpdate, model.GPSMinTime, null);
+            //_map.MoveCamera(cameraUpdate);
         }
 
-        private void DrawCircle(LatLng circleCenter, int radius, Color fillColor, Color strokeColor, int strokeWidth)
+        private void DrawCircle(LatLng circleCenter, int radius, Color fillColor, Color strokeColor, int strokeWidth, int zIndex = 10)
         {
             CircleOptions circleOptions = new CircleOptions();
             circleOptions.InvokeCenter(circleCenter);
@@ -267,7 +279,7 @@ namespace Running_Tracker.ViewActivity
             circleOptions.InvokeFillColor(fillColor);
             circleOptions.InvokeStrokeColor(strokeColor);
             circleOptions.InvokeStrokeWidth(strokeWidth);
-            circleOptions.InvokeZIndex(10);
+            circleOptions.InvokeZIndex(zIndex);
 
             _map.AddCircle(circleOptions);
         }
