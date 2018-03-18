@@ -66,7 +66,7 @@ namespace Running_Tracker.ViewActivity
             sumDistance = 0;
             lines = new List<LatLng>();
             circles = new List<LatLng>();
-            rectOptions = new PolylineOptions().InvokeColor(Color.Red).InvokeZIndex(5);
+            rectOptions = new PolylineOptions();
 
 
             //toolbar
@@ -160,6 +160,7 @@ namespace Running_Tracker.ViewActivity
 
             // Medium speed's color
             rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
+            rectOptions.InvokeZIndex(5);
 
             //draw
             DrawMap();
@@ -207,6 +208,8 @@ namespace Running_Tracker.ViewActivity
                 case MainButtonStates.Start:
                     try
                     {
+                        circles.Clear();
+                        rectOptions = new PolylineOptions();
                         model.StartRunning();
                         model.UserPosition -= Model_UserPosition;
                         _map.Clear();
@@ -220,10 +223,13 @@ namespace Running_Tracker.ViewActivity
                     }
                     break;
                 case MainButtonStates.Stop:
-                    model.StopRunning();
+                    bool saved = model.StopRunning();
                     MainButtonState = MainButtonStates.Start;
                     mainButton.Text = "Start";
-                    Toast.MakeText(this, "Running is saved", ToastLength.Long).Show();
+                    if(saved)
+                        Toast.MakeText(this, "Running was saved", ToastLength.Long).Show();
+                    else
+                        Toast.MakeText(this, "Running wasn't saved", ToastLength.Long).Show();
                     break;
             }
 
@@ -252,6 +258,7 @@ namespace Running_Tracker.ViewActivity
         {
             circles.Add(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
             DrawMap();
+            speedTextView.Text = "0";
         }
 
         private void MoveCamera(LatLng location, float? zoom)

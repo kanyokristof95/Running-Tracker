@@ -271,15 +271,17 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Stop and save the current running.
         /// </summary>
-        public void StopRunning()
+        public bool StopRunning()
         {
             if(runningData != null)
             {
                 runningData.Finish();
                 runningTimer.Stop();
-                SaveRunning(runningData);
+                bool ret = SaveRunning(runningData);
                 runningData = null;
+                return ret;
             }
+            return false;
         }
         
         #endregion
@@ -382,10 +384,14 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Save the running in the parameter.
         /// </summary>
-        public void SaveRunning(RunningData running)
+        public bool SaveRunning(RunningData running)
         {
-            if(running.Locations.Count >= 2)
+            if (running.Locations.Count >= 2)
+            {
                 runningTrackerDataAccess.SaveRunning(running);
+                return true;
+            }
+            return false;
         }
 
         /// <summary>

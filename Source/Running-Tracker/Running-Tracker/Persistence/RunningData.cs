@@ -150,6 +150,7 @@ namespace Running_Tracker.Persistence
 
             PersonalInformation = personalDatas;
             Locations = new List<LocationData>();
+            Stops = new List<LatLng>();
             StartDateTime = DateTime.Now;
         }
 
