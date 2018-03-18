@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Android.Gms.Maps.Model;
+using System;
 using System.Collections.Generic;
 
 namespace Running_Tracker.Persistence
@@ -12,6 +13,11 @@ namespace Running_Tracker.Persistence
         /// Locations of the running.
         /// </summary>
         public List<LocationData> Locations { get; set; }
+
+        /// <summary>
+        /// Locations of running's stops
+        /// </summary>
+        public List<LatLng> Stops { get; set; }
         
         /// <summary>
         /// The runner's personal datas
@@ -150,7 +156,7 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// Add the new location to the list of locations
         /// </summary>
-        public void Add(LocationData location)
+        public void AddLocation(LocationData location)
         {
             if (Open)
             {
@@ -169,6 +175,16 @@ namespace Running_Tracker.Persistence
                 Distance += location.Distance;
                 Locations.Add(location);
             }
+        }
+
+        /// <summary>
+        /// Add a new stop for the running
+        /// </summary>
+        /// <param name="location"></param>
+        public void AddStop(LatLng location)
+        {
+            if (Open)
+                Stops.Add(location);
         }
 
         /// <summary>

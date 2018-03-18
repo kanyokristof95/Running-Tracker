@@ -1,4 +1,5 @@
-﻿using Android.Locations;
+﻿using Android.Gms.Maps.Model;
+using Android.Locations;
 using Running_Tracker.Persistence;
 using System;
 using System.Collections.Generic;
@@ -153,6 +154,7 @@ namespace Running_Tracker.Model
                     if (numOfContinuouslyStopsForSignal == 0)
                     {
                         OnUserStopped(new LocationData(location.Longitude, location.Latitude, 0, 0, 0, 0, RunningSpeed.Slow));
+                        runningData.AddStop(new LatLng(location.Latitude, location.Longitude));
                     }
                 }
                 else
@@ -204,7 +206,7 @@ namespace Running_Tracker.Model
                 }
                     
                 LocationData currentLocationData = new LocationData(location.Longitude, location.Latitude, speed, distance, up, down, runningSpeed);
-                runningData.Add(currentLocationData);
+                runningData.AddLocation(currentLocationData);
                     
                 OnNewPosition(currentLocationData);
                     
@@ -299,7 +301,7 @@ namespace Running_Tracker.Model
         public event EventHandler<PositionArgs> UserPosition;
 
         /// <summary>
-        /// This signal is sent when the running is not started. It contains the user's latest position.
+        /// This signal is sent when the user stopped.
         /// </summary>
         public event EventHandler<PositionArgs> UserStopped;
 
