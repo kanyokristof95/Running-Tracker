@@ -28,6 +28,8 @@ namespace Running_Tracker.Model
 
         private int numOfContinuouslyStopsForSignal;
 
+        private int checkVerticalDistanceRemaining;
+        private Location oldLocation;
         private Location previousLocation;
         private Location currentLocation;
 
@@ -40,7 +42,7 @@ namespace Running_Tracker.Model
         /// </summary>
         public int GPSMinTime
         {
-            get { return 500; } // TODO - maybe to 1000
+            get { return 1000; }
         }
 
         /// <summary>
@@ -57,7 +59,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// The number of position calibrating.
         /// </summary>
-        public const int DefaultCalibratingPosition = (debug) ? 1 : 8; // TODO - maybe to 10
+        public const int DefaultCalibratingPosition = (debug) ? 1 : 7; 
 
         /// <summary>
         /// The minimum accuracy of gps signal.
@@ -72,7 +74,12 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Minimum gps signal to send the location as a stopping location
         /// </summary>
-        public const int NumOfContinuouslyStopsForSignal = 8;
+        public const int NumOfContinuouslyStopsForSignal = 5;
+
+        /// <summary>
+        /// Minimus gps signal to calculate vertical distance
+        /// </summary>
+        public const int NumOfCheckVerticalDistance = 30;
 
         #endregion
 
@@ -153,8 +160,17 @@ namespace Running_Tracker.Model
 
                     if (numOfContinuouslyStopsForSignal == 0)
                     {
-                        OnUserStopped(new LocationData(location.Longitude, location.Latitude, 0, 0, 0, 0, RunningSpeed.Slow));
-                        runningData.AddStop(new LatLng(location.Latitude, location.Longitude));
+                        bool near = false;
+                        foreach(LatLng coordinate in runningData.Stops)
+                        {
+                            near = location.DistanceTo(new Location("gps") { Longitude = coordinate.Longitude, Latitude = coordinate.Latitude}) < 3 * 14;
+                        }
+
+                        if(!near)
+                        {
+                            OnUserStopped(new LocationData(location.Longitude, location.Latitude, 0, 0, 0, 0, RunningSpeed.Slow));
+                            runningData.AddStop(new LatLng(location.Latitude, location.Longitude));
+                        }
                     }
                 }
                 else
@@ -164,7 +180,12 @@ namespace Running_Tracker.Model
 
                 // If the user's position is not changed do nothing 
                 if (previousLocation != null && location.Speed == 0) return;
-                
+
+                if(checkVerticalDistanceRemaining == 0)
+                    oldLocation = location;
+
+                checkVerticalDistanceRemaining++;
+
                 previousLocation = currentLocation;
                 currentLocation = location;
 
@@ -174,7 +195,12 @@ namespace Running_Tracker.Model
                 if (previousLocation != null)
                 {
                     distance = currentLocation.DistanceTo(previousLocation);
-                    verticalDistance = currentLocation.Altitude - previousLocation.Altitude;
+                    
+                    if (checkVerticalDistanceRemaining % NumOfCheckVerticalDistance == 0)
+                    {
+                        verticalDistance = currentLocation.Altitude - oldLocation.Altitude;
+                        checkVerticalDistanceRemaining = 0;
+                    }
                 }
 
                 double up = 0;
@@ -261,6 +287,7 @@ namespace Running_Tracker.Model
                 distanceWarningYet = false;
                 timeWarningYet = false;
                 numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
+                checkVerticalDistanceRemaining = 0;
                 runningTimer.Start();
             } else
             {

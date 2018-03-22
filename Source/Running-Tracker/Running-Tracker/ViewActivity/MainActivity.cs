@@ -171,7 +171,7 @@ namespace Running_Tracker.ViewActivity
         {
             _map.Clear();
             _map.AddPolyline(rectOptions);
-
+            
             foreach (var circle in circles)
             {
                 DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1, 10);
@@ -186,8 +186,8 @@ namespace Running_Tracker.ViewActivity
             _map.Clear();
 
             lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
-            DrawCircle(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 9, Color.Rgb(69, 140, 228), Color.White, 2);
-            MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 16);
+            DrawMap();
+            MoveCamera(new LatLng(e.LocationData.Latitude, e.LocationData.Longitude), 16, false);
 
             if (!model.IsRunning)
             {
@@ -261,7 +261,7 @@ namespace Running_Tracker.ViewActivity
             speedTextView.Text = "0";
         }
 
-        private void MoveCamera(LatLng location, float? zoom)
+        private void MoveCamera(LatLng location, float? zoom, bool animate = true)
         {
             CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
             builder.Target(location);
@@ -274,8 +274,10 @@ namespace Running_Tracker.ViewActivity
             CameraPosition cameraPosition = builder.Build();
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
             
-            _map.AnimateCamera(cameraUpdate, model.GPSMinTime, null);
-            //_map.MoveCamera(cameraUpdate);
+            if(animate)
+                _map.AnimateCamera(cameraUpdate, model.GPSMinTime, null);
+            else
+                _map.MoveCamera(cameraUpdate);
         }
 
         private void DrawCircle(LatLng circleCenter, int radius, Color fillColor, Color strokeColor, int strokeWidth, int zIndex = 10)
