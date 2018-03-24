@@ -161,7 +161,7 @@ namespace Running_Tracker.Model
                     if (numOfContinuouslyStopsForSignal == 0)
                     {
                         bool near = false;
-                        foreach(LatLng coordinate in runningData.Stops)
+                        foreach(Position coordinate in runningData.Stops)
                         {
                             near = location.DistanceTo(new Location("gps") { Longitude = coordinate.Longitude, Latitude = coordinate.Latitude}) < 3 * 14;
                         }
@@ -169,7 +169,7 @@ namespace Running_Tracker.Model
                         if(!near)
                         {
                             OnUserStopped(new LocationData(location.Longitude, location.Latitude, 0, 0, 0, 0, RunningSpeed.Slow));
-                            runningData.AddStop(new LatLng(location.Latitude, location.Longitude));
+                            runningData.AddStop(new Position(location.Latitude, location.Longitude));
                         }
                     }
                 }

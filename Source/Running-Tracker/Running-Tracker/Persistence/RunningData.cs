@@ -17,7 +17,7 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// Locations of running's stops
         /// </summary>
-        public List<LatLng> Stops { get; set; }
+        public List<Position> Stops { get; set; }
         
         /// <summary>
         /// The runner's personal datas
@@ -150,7 +150,7 @@ namespace Running_Tracker.Persistence
 
             PersonalInformation = personalDatas;
             Locations = new List<LocationData>();
-            Stops = new List<LatLng>();
+            Stops = new List<Position>();
             StartDateTime = DateTime.Now;
         }
 
@@ -181,8 +181,7 @@ namespace Running_Tracker.Persistence
         /// <summary>
         /// Add a new stop for the running
         /// </summary>
-        /// <param name="location"></param>
-        public void AddStop(LatLng location)
+        public void AddStop(Position location)
         {
             if (Open)
                 Stops.Add(location);
