@@ -44,9 +44,12 @@ namespace Running_Tracker.ViewActivity
         TextView distanceTextView;
         double sumDistance;
 
-        List<LatLng> lines;
         List<LatLng> circles;
         PolylineOptions rectOptions;
+
+        List<List<PositionArgs>> lines;
+        Persistence.RunningSpeed lastRunningSpeedType;
+
 
 
         protected override void OnCreate(Bundle savedInstanceState)
@@ -64,9 +67,11 @@ namespace Running_Tracker.ViewActivity
             //inicializáció
             MainButtonState = MainButtonStates.Calibrating;
             sumDistance = 0;
-            lines = new List<LatLng>();
+            lines = new List<List<PositionArgs>>();
+            lines.Add(new List<PositionArgs>());
             circles = new List<LatLng>();
             rectOptions = new PolylineOptions();
+            lastRunningSpeedType = Persistence.RunningSpeed.StartPoint;
 
 
             //toolbar
@@ -154,13 +159,16 @@ namespace Running_Tracker.ViewActivity
             distanceTextView.Text = Math.Round(sumDistance, 2).ToString();
 
             // map refresh
-
-            lines.Add(lastUserPosition);
-            rectOptions.Add(lines[lines.Count - 1]);
-
-            // Medium speed's color
-            rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
-            rectOptions.InvokeZIndex(5);
+            if(e.LocationData.RunningSpeedType == lastRunningSpeedType)
+            {
+                lines[lines.Count - 1].Add(e);
+            }
+            else
+            {
+                lastRunningSpeedType = e.LocationData.RunningSpeedType;
+                lines.Add(new List<PositionArgs>());
+                lines[lines.Count - 1].Add(e);
+            }
 
             //draw
             DrawMap();
@@ -170,8 +178,43 @@ namespace Running_Tracker.ViewActivity
         private void DrawMap()
         {
             _map.Clear();
-            _map.AddPolyline(rectOptions);
 
+            PositionArgs lastPositionArgs = null;
+
+            foreach (var line in lines)
+            {
+                rectOptions = new PolylineOptions();
+                
+                if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Normal || line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.StartPoint)
+                {
+                    rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
+                }
+                else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Fast)
+                {
+                    rectOptions.InvokeColor(Color.Rgb(33, 175, 95));
+                }
+                else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Slow)
+                {
+                    rectOptions.InvokeColor(Color.Rgb(238, 163, 54));
+                }
+
+                rectOptions.InvokeZIndex(5);
+
+                if (lastPositionArgs != null)
+                {
+                    rectOptions.Add(new LatLng(lastPositionArgs.LocationData.Latitude, lastPositionArgs.LocationData.Longitude));
+                }
+
+                foreach (var position in line)
+                {
+                    rectOptions.Add(new LatLng(position.LocationData.Latitude, position.LocationData.Longitude));
+                    lastPositionArgs = position;
+                }
+
+                _map.AddPolyline(rectOptions);
+                
+            }
+           
             foreach (var circle in circles)
             {
                 DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1, 10);

@@ -19,6 +19,7 @@ namespace MapIntegration2
         int i = 0;
 
         List<LatLng> lines;
+        List<LatLng> lines2;
         PolylineOptions rectOptions;
 
         public void OnMapReady(GoogleMap map)
@@ -34,8 +35,23 @@ namespace MapIntegration2
 
             _map.MoveCamera(cameraUpdate);
 
-            /*PolylineOptions rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+            PolylineOptions rectOptions = new PolylineOptions().InvokeColor(Color.Red);
+            foreach (var point in lines)
+            {
+                rectOptions.Add(point);
+            }
+            _map.AddPolyline(rectOptions);
+
+            rectOptions = new PolylineOptions().InvokeColor(Color.Blue);
             
+            foreach (var point in lines2)
+            {
+                rectOptions.Add(point);
+            }
+            _map.AddPolyline(rectOptions);
+            
+            
+            /*
             rectOptions.Add(new LatLng(37.785559, -122.396728));
             rectOptions.Add(new LatLng(37.780624, -122.390541));
             rectOptions.Add(new LatLng(37.777113, -122.394983));
@@ -74,6 +90,11 @@ namespace MapIntegration2
                 new LatLng(37.785559, -122.396728), // 0
                 new LatLng(37.780624, -122.390541), // 1
                 new LatLng(37.777113, -122.394983), // 2
+
+            };
+
+            lines2 = new List<LatLng>
+            {
                 new LatLng(37.776831, -122.394627), // 3
                 new LatLng(37.776831, -122.404627) // 4
             };
@@ -85,7 +106,7 @@ namespace MapIntegration2
                 Interval = 5000
             };
             timer.Elapsed += Timer_Elapsed;
-            timer.Start();
+            //timer.Start();
         }
 
         private void Timer_Elapsed(object sender, ElapsedEventArgs e)
