@@ -177,6 +177,7 @@ namespace Running_Tracker.ViewActivity
 
         private void DrawMap()
         {
+           
             _map.Clear();
 
             PositionArgs lastPositionArgs = null;
@@ -184,39 +185,40 @@ namespace Running_Tracker.ViewActivity
             foreach (var line in lines)
             {
                 rectOptions = new PolylineOptions();
-                
-                if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Normal || line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.StartPoint)
-                {
-                    rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
-                }
-                else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Fast)
-                {
-                    rectOptions.InvokeColor(Color.Rgb(33, 175, 95));
-                }
-                else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Slow)
-                {
-                    rectOptions.InvokeColor(Color.Rgb(238, 163, 54));
-                }
 
-                rectOptions.InvokeZIndex(5);
-
-                if (lastPositionArgs != null)
+                if (line.Count > 0)
                 {
-                    rectOptions.Add(new LatLng(lastPositionArgs.LocationData.Latitude, lastPositionArgs.LocationData.Longitude));
-                }
+                    if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Normal || line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.StartPoint)
+                    {
+                        rectOptions.InvokeColor(Color.Rgb(51, 127, 192));
+                    }
+                    else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Fast)
+                    {
+                        rectOptions.InvokeColor(Color.Rgb(33, 175, 95));
+                    }
+                    else if (line[0].LocationData.RunningSpeedType == Persistence.RunningSpeed.Slow)
+                    {
+                        rectOptions.InvokeColor(Color.Rgb(238, 163, 54));
+                    }
 
-                foreach (var position in line)
-                {
-                    rectOptions.Add(new LatLng(position.LocationData.Latitude, position.LocationData.Longitude));
-                    lastPositionArgs = position;
-                }
+                    rectOptions.InvokeZIndex(5);
 
-                _map.AddPolyline(rectOptions);
-                
+                    if (lastPositionArgs != null)
+                    {
+                        rectOptions.Add(new LatLng(lastPositionArgs.LocationData.Latitude, lastPositionArgs.LocationData.Longitude));
+                    }
+
+                    foreach (var position in line)
+                    {
+                        rectOptions.Add(new LatLng(position.LocationData.Latitude, position.LocationData.Longitude));
+                        lastPositionArgs = position;
+                    }
+
+                    _map.AddPolyline(rectOptions);
+
+                }
             }
-           
-            _map.AddPolyline(rectOptions);
-            
+
             foreach (var circle in circles)
             {
                 DrawCircle(circle, 14, Color.Rgb(213, 52, 58), Color.Black, 1, 10);
