@@ -5,202 +5,202 @@
     android:layout_height="match_parent"
     android:minWidth="25px"
     android:minHeight="25px">
-    <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:id="@+id/toolbar"
-        android:layout_height="wrap_content"
-        android:layout_width="match_parent"
-        android:minHeight="?attr/actionBarSize"
-        android:background="?attr/colorPrimary"
-        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
-        android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+  <android.support.v7.widget.Toolbar xmlns:app="http://schemas.android.com/apk/res-auto"
+      android:id="@+id/toolbar"
+      android:layout_height="wrap_content"
+      android:layout_width="match_parent"
+      android:minHeight="?attr/actionBarSize"
+      android:background="?attr/colorPrimary"
+      android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+      android:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+  <LinearLayout
+      android:layout_width="fill_parent"
+      android:layout_height="fill_parent"
+      android:orientation="vertical">
     <LinearLayout
         android:layout_width="fill_parent"
-        android:layout_height="fill_parent"
-        android:orientation="vertical">
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:padding="10dp"
+        android:orientation="vertical"
+        android:id="@+id/mainLayout">
+      <!-- Elrejti a kezdetleges auto focus-t -->
+      <LinearLayout
+          android:focusable="true"
+          android:focusableInTouchMode="true"
+          android:layout_width="0px"
+          android:layout_height="0px" />
+      <!-- Personal datas -->
+      <TextView
+          android:text="Personal datas"
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:paddingLeft="10dp">
+        <!-- Sex -->
         <LinearLayout
             android:layout_width="fill_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
-            android:padding="10dp"
-            android:orientation="vertical"
-            android:id="@+id/mainLayout">
-        <!-- Elrejti a kezdetleges auto focus-t -->
-            <LinearLayout
-                android:focusable="true"
-                android:focusableInTouchMode="true"
-                android:layout_width="0px"
-                android:layout_height="0px" />
-        <!-- Personal datas -->
-            <TextView
-                android:text="Personal datas"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="10dp">
-            <!-- Sex -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Sex: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <RadioGroup
-                        android:minWidth="25px"
-                        android:minHeight="25px"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:id="@+id/sexGroup">
-                        <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:paddingRight="30dp"
-                            android:checked="true"
-                            android:text="Male"
-                            android:id="@+id/sexMale" />
-                        <RadioButton
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Female"
-                            android:id="@+id/sexFemale" />
-                    </RadioGroup>
-                </LinearLayout>
-            <!-- Height -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Height: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <EditText
-                        android:inputType="number"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Height (cm)"
-                        android:id="@+id/height" />
-                </LinearLayout>
-            <!-- Weight -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Weight: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <EditText
-                        android:inputType="number"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Weight (kg)"
-                        android:id="@+id/weight" />
-                </LinearLayout>
-            </LinearLayout>
-        <!-- Warning values -->
-            <TextView
-                android:text="Warning values"
-                android:textAppearance="?android:attr/textAppearanceLarge"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:paddingTop="20dp" />
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:paddingLeft="10dp">
-            <!-- Distance -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Distance: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <EditText
-                        android:inputType="number"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Distance (m)"
-                        android:id="@+id/distance" />
-                </LinearLayout>
-            <!-- Time -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Time: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <EditText
-                        android:inputType="number"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:hint="Time (min)"
-                        android:id="@+id/time" />
-                </LinearLayout>
-            <!-- Speed -->
-                <LinearLayout
-                    android:layout_width="fill_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="horizontal">
-                    <TextView
-                        android:text="Speed: "
-                        android:textAppearance="?android:attr/textAppearanceMedium"
-                        android:layout_width="85dp"
-                        android:layout_height="match_parent"
-                        android:gravity="center_vertical"
-                        android:textColor="@android:color/black" />
-                    <LinearLayout
-                        android:layout_width="fill_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="vertical">
-                        <EditText
-                            android:inputType="numberDecimal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Minimum speed (km/h)"
-                            android:id="@+id/minSpeed" />
-                        <EditText
-                            android:inputType="numberDecimal"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:hint="Maximum speed (km/h)"
-                            android:id="@+id/maxSpeed" />
-                    </LinearLayout>
-                </LinearLayout>
-            </LinearLayout>
-        </LinearLayout>
-        <Button
-            android:text="Save"
-            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:id="@+id/saveButton"
-            android:background="?attr/colorPrimary"
-            android:textColor="@android:color/white" />
+            android:orientation="horizontal">
+          <TextView
+              android:text="Sex: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <RadioGroup
+              android:minWidth="25px"
+              android:minHeight="25px"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:orientation="horizontal"
+              android:id="@+id/sexGroup">
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingRight="30dp"
+                android:checked="true"
+                android:text="Male"
+                android:id="@+id/sexMale" />
+            <RadioButton
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Female"
+                android:id="@+id/sexFemale" />
+          </RadioGroup>
+        </LinearLayout>
+        <!-- Height -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+          <TextView
+              android:text="Height: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <EditText
+              android:inputType="number"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:hint="Height (cm)"
+              android:id="@+id/height" />
+        </LinearLayout>
+        <!-- Weight -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+          <TextView
+              android:text="Weight: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <EditText
+              android:inputType="number"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:hint="Weight (kg)"
+              android:id="@+id/weight" />
+        </LinearLayout>
+      </LinearLayout>
+      <!-- Warning values -->
+      <TextView
+          android:text="Warning values"
+          android:textAppearance="?android:attr/textAppearanceLarge"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:paddingTop="20dp" />
+      <LinearLayout
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          android:paddingLeft="10dp">
+        <!-- Distance -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+          <TextView
+              android:text="Distance: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <EditText
+              android:inputType="number"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:hint="Distance (m)"
+              android:id="@+id/distance" />
+        </LinearLayout>
+        <!-- Time -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+          <TextView
+              android:text="Time: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <EditText
+              android:inputType="number"
+              android:layout_width="match_parent"
+              android:layout_height="wrap_content"
+              android:hint="Time (min)"
+              android:id="@+id/time" />
+        </LinearLayout>
+        <!-- Speed -->
+        <LinearLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+          <TextView
+              android:text="Speed: "
+              android:textAppearance="?android:attr/textAppearanceMedium"
+              android:layout_width="85dp"
+              android:layout_height="match_parent"
+              android:gravity="center_vertical"
+              android:textColor="@android:color/black" />
+          <LinearLayout
+              android:layout_width="fill_parent"
+              android:layout_height="wrap_content"
+              android:orientation="vertical">
+            <EditText
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Minimum speed (km/h)"
+                android:id="@+id/minSpeed" />
+            <EditText
+                android:inputType="numberDecimal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="Maximum speed (km/h)"
+                android:id="@+id/maxSpeed" />
+          </LinearLayout>
+        </LinearLayout>
+      </LinearLayout>
     </LinearLayout>
+    <Button
+        android:text="Save"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:id="@+id/saveButton"
+        android:background="?attr/colorPrimary"
+        android:textColor="@android:color/white" />
+  </LinearLayout>
 </LinearLayout>
