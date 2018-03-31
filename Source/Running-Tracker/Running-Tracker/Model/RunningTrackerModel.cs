@@ -310,6 +310,12 @@ namespace Running_Tracker.Model
             }
             return false;
         }
+
+        public void SaveSettings(PersonalData personalData, WarningValues warningValues)
+        {
+            runningTrackerDataAccess.CurrentPersonalDatas = personalData;
+            runningTrackerDataAccess.CurrentWarningValues = warningValues;
+        }
         
         #endregion
 
