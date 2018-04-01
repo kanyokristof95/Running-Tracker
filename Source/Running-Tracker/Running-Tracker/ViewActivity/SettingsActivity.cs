@@ -62,7 +62,7 @@ namespace Running_Tracker.ViewActivity
                 personalData = new PersonalData
                 {
                     Height = Int32.Parse(heightBox.Text),
-                    Weight = Int32.Parse(heightBox.Text),
+                    Weight = Int32.Parse(weightBox.Text),
                     Sex = sex
                 };
 
