@@ -45,7 +45,7 @@ namespace Running_Tracker.ViewActivity
                 distanceBox.Text = warningValues.Distance.ToString();
                 minSpeedBox.Text = warningValues.MinimumSpeed.ToString();
                 maxSpeedBox.Text = warningValues.MaximumSpeed.ToString();
-                timeBox.Text = warningValues.Time.Minutes.ToString();
+                timeBox.Text = warningValues.Time.TotalMinutes.ToString();
                 sexMaleBox.Checked = personalData.Sex.Equals(Gender.Male);
                 sexFemaleBox.Checked = personalData.Sex.Equals(Gender.Female);
 
