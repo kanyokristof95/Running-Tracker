@@ -222,6 +222,8 @@ namespace Running_Tracker.Model
 
                 if (_remaningSameColor == 0)
                 {
+                    _remaningSameColor = MinLengthOfSameColor;
+
                     if (_previousLocation == null)
                     {
                         runningSpeed = RunningSpeed.StartPoint;
