@@ -296,7 +296,7 @@ namespace Running_Tracker.ViewActivity
             model.CurrentRunningDuration += Model_CurrentTimeSpan;
             model.Warning += Model_Warning;
             model.UserPosition += Model_UserPosition;
-            model.GPS_Ready += Model_GPS_Ready;
+            model.GpsReady += Model_GPS_Ready;
             model.NewPosition += Model_NewPosition;
             model.UserStopped += Model_UserStopped;
         }
@@ -322,7 +322,7 @@ namespace Running_Tracker.ViewActivity
             CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
             
             if(animate)
-                _map.AnimateCamera(cameraUpdate, model.GPSMinTime, null);
+                _map.AnimateCamera(cameraUpdate, model.GpsMinTime, null);
             else
                 _map.MoveCamera(cameraUpdate);
         }
@@ -362,7 +362,7 @@ namespace Running_Tracker.ViewActivity
                     locationProvider = string.Empty;
                 }
                 
-                locationManager.RequestLocationUpdates(locationProvider, model.GPSMinTime, model.GPSMinDistance, this);
+                locationManager.RequestLocationUpdates(locationProvider, model.GpsMinTime, model.GpsMinDistance, this);
                 
                 if (!model.IsRunning)
                 {
