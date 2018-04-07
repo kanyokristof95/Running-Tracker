@@ -222,8 +222,6 @@ namespace Running_Tracker.Model
 
                 if (_remaningSameColor == 0)
                 {
-                    _remaningSameColor = MinLengthOfSameColor;
-
                     if (_previousLocation == null)
                     {
                         runningSpeed = RunningSpeed.StartPoint;
@@ -239,6 +237,11 @@ namespace Running_Tracker.Model
                     else
                     {
                         runningSpeed = RunningSpeed.Normal;
+                    }
+
+                    if (runningSpeed != _previousRunningSpeed && _previousRunningSpeed != RunningSpeed.StartPoint)
+                    {
+                        _remaningSameColor = MinLengthOfSameColor;
                     }
                 }
                 else
@@ -307,7 +310,7 @@ namespace Running_Tracker.Model
                 _numOfContinuouslyStopsForSignal = NumOfContinuouslyStopsForSignal;
                 _checkVerticalDistanceRemaining = 0;
 
-                _previousRunningSpeed = RunningSpeed.Normal;
+                _previousRunningSpeed = RunningSpeed.StartPoint;
                 _remaningSameColor = 0;
 
                 _runningTimer.Start();
