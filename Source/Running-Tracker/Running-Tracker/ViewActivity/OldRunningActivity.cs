@@ -1,51 +1,48 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
-using System.Text;
 using Android.App;
-using Android.Content;
 using Android.OS;
-using Android.Runtime;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
-using Android.Locations;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using Android.Graphics;
-using System.Timers;
 using Android.Content.PM;
+using Running_Tracker.Persistence;
+using Newtonsoft.Json;
 
 namespace Running_Tracker.ViewActivity
 {
     [Activity(Label = "OldRunningActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class OldRunningActivity : BaseActivity , IOnMapReadyCallback
     {
-        GoogleMap _map;
-        MapFragment _mapFragment;
+        private GoogleMap _map;
+        private MapFragment _mapFragment;
+        private RunningData _running;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
             SetContentView(Resource.Layout.OldRunning);
 
-            //toolbar
-            Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
+            // Toolbar
+            var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Run details";
-
-
-            //map
+            
+            // Map
             _mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
 
             if (_mapFragment == null)
             {
-                GoogleMapOptions mapOptions = new GoogleMapOptions()
+                var mapOptions = new GoogleMapOptions()
                     .InvokeMapType(GoogleMap.MapTypeNormal)
                     .InvokeZoomControlsEnabled(true)
                     .InvokeCompassEnabled(true);
 
-                FragmentTransaction fragTx = FragmentManager.BeginTransaction();
+                var fragTx = FragmentManager.BeginTransaction();
                 _mapFragment = MapFragment.NewInstance(mapOptions);
                 fragTx.Add(Resource.Id.map, _mapFragment, "map");
                 fragTx.Commit();
@@ -63,30 +60,108 @@ namespace Running_Tracker.ViewActivity
         public void OnMapReady(GoogleMap map)
         {
             _map = map;
+            _running = JsonConvert.DeserializeObject<RunningData>(Intent.GetStringExtra("Running"));
 
-            LatLng location = new LatLng(37.785559, -122.396728);
-            CameraPosition.Builder builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
-            builder.Zoom(14);
-            CameraPosition cameraPosition = builder.Build();
-            CameraUpdate cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+            var b = new LatLngBounds.Builder()
+                .Include(new LatLng(_running.MinLatitude, _running.MinLongitude))
+                .Include(new LatLng(_running.MaxLatitude, _running.MaxLongitude));
+            _map.MoveCamera(CameraUpdateFactory.NewLatLngBounds(b.Build(), 120));
+            
+            var lastPointSpeedType = RunningSpeed.StartPoint;
 
-            _map.MoveCamera(cameraUpdate);
+            PolylineOptions polylineOptions = null;
+            LatLng lastPosition = null;
+
+            foreach(var point in _running.Locations)
+            {
+                if (point.RunningSpeedType != lastPointSpeedType)
+                {
+                    lastPointSpeedType = point.RunningSpeedType;
+                    if (polylineOptions != null)
+                    {
+                        _map.AddPolyline(polylineOptions);
+
+                        lastPosition = polylineOptions.Points.Last();
+                        polylineOptions = new PolylineOptions();
+                    }
+                    else
+                    {
+                        polylineOptions = new PolylineOptions();
+                    }
+                    
+                    switch (point.RunningSpeedType)
+                    {
+                        case RunningSpeed.Slow:
+                            polylineOptions.InvokeColor(Color.Rgb(238, 163, 54));
+                            break;
+                        case RunningSpeed.Normal:
+                            polylineOptions.InvokeColor(Color.Rgb(51, 127, 192));
+                            break;
+                        case RunningSpeed.Fast:
+                            polylineOptions.InvokeColor(Color.Rgb(33, 175, 95));
+                            break;
+                        case RunningSpeed.StartPoint:
+                            break;
+                        default:
+                            throw new ArgumentOutOfRangeException();
+                    }
+
+                    if (lastPosition != null)
+                        polylineOptions.Add(lastPosition);
+                }
+
+                polylineOptions?.Add(new LatLng(point.Latitude, point.Longitude));
+            }
+            
+            _map.AddPolyline(polylineOptions);
+
+            foreach (var circle in _running.Stops)
+            {
+                var circleOptions = new CircleOptions();
+                circleOptions.InvokeCenter(new LatLng(circle.Latitude, circle.Longitude));
+                circleOptions.InvokeRadius(14);
+                circleOptions.InvokeFillColor(Color.Rgb(213, 52, 58));
+                circleOptions.InvokeStrokeColor(Color.Black);
+                circleOptions.InvokeStrokeWidth(1);
+                circleOptions.InvokeZIndex(10);
+
+                _map.AddCircle(circleOptions);
+            }
+
+            var hour = _running.Duration.Hours;
+            var min = _running.Duration.Minutes;
+            var sec = _running.Duration.Seconds;
+
+            FindViewById<TextView>(Resource.Id.txtTimer).Text = $"{hour:00}:{min:00}:{sec:00}";
+            FindViewById<TextView>(Resource.Id.distance).Text = Math.Round(_running.Distance, 2).ToString(CultureInfo.InvariantCulture);
+            FindViewById<TextView>(Resource.Id.avgSpeed).Text = Math.Round(_running.AverageSpeed, 2).ToString(CultureInfo.InvariantCulture);
+            FindViewById<TextView>(Resource.Id.up).Text = Math.Round(_running.Up, 2).ToString(CultureInfo.InvariantCulture);
+            FindViewById<TextView>(Resource.Id.down).Text = Math.Round(_running.Down, 2).ToString(CultureInfo.InvariantCulture);
+            FindViewById<TextView>(Resource.Id.calorie).Text = Math.Round(_running.Calorie, 2).ToString(CultureInfo.InvariantCulture);
         }
 
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
-            switch (item.ItemId)
+
+            if(item.ItemId == Resource.Id.undo)
             {
-                case Resource.Id.undo:
-                    base.OnBackPressed();
-                    break;
-                case Resource.Id.delete:
-                    //TODO felugróablak megerősítést kér a törlésről, majd megerősítés esetén a törlés elvégzése
-                    base.OnBackPressed();
-                    break;
-                default:
-                    break;
+                OnBackPressed();
+            } else if (item.ItemId == Resource.Id.delete)
+            {
+                var alertDialog = new Android.Support.V7.App.AlertDialog.Builder(this);
+                alertDialog.SetTitle("Delete running");
+                alertDialog.SetMessage("Are you sure you want delete this run?");
+                alertDialog.SetNegativeButton("No", delegate
+                {
+                    
+                });
+
+                alertDialog.SetPositiveButton("Yes", delegate
+                {
+                    model.DeleteRunning(_running);
+                    OnBackPressed();
+                });
+                alertDialog.Show();
             }
 
             return base.OnOptionsItemSelected(item);

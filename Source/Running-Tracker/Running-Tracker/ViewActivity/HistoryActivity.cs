@@ -1,16 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿using System.Collections.Generic;
 using Android.App;
 using Android.Content;
 using Android.Content.PM;
 using Android.OS;
-using Android.Runtime;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
+using Newtonsoft.Json;
 using Running_Tracker.Persistence;
 
 namespace Running_Tracker.ViewActivity
@@ -18,8 +13,9 @@ namespace Running_Tracker.ViewActivity
     [Activity(Label = "HistoryActivity", Theme = "@style/MyTheme", ScreenOrientation = ScreenOrientation.Portrait)]
     public class HistoryActivity : BaseActivity
     {
-        private List<RunningData> mItems;
-        ArrayAdapter<RunningData> adapter;
+        private List<RunningData> _mItems;
+        private ListView _mListVIew;
+        private ArrayAdapter<RunningData> _adapter;
 
         protected override void OnCreate(Bundle savedInstanceState)
         {
@@ -27,39 +23,20 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.History);
 
-            //Toolbar beállítása
-            Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
+            // Toolbar
+            var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "History";
 
-            //Listview beállítása
-            ListView mListVIew = FindViewById<ListView>(Resource.Id.myListView);
-            mItems = model.LoadPreviousRunnings();
-
-            adapter = new ArrayAdapter<RunningData>(this, Android.Resource.Layout.SimpleListItem1, mItems);
-            mListVIew.Adapter = adapter;
-            mListVIew.ItemClick += MListVIew_ItemClick;
-            mListVIew.ItemLongClick += MListVIew_ItemLongClick;
-
+            // Listview
+            _mListVIew = FindViewById<ListView>(Resource.Id.myListView);
+            _mListVIew.ItemClick += MListVIew_ItemClick;
         }
-
-        private void MListVIew_ItemLongClick(object sender, AdapterView.ItemLongClickEventArgs e)
-        {
-            Android.Support.V7.App.AlertDialog.Builder alertDialog = new Android.Support.V7.App.AlertDialog.Builder(this);
-            alertDialog.SetTitle("Details");
-            //TODO a futás adatainak kiírása a felugróablakba 
-            alertDialog.SetMessage("TODO Running Details");
-
-            alertDialog.SetPositiveButton("OK", delegate{});
-            alertDialog.Show();
-        }
-
+        
         private void MListVIew_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
-            //TODO A kiválasztott futás részletes megjelenítése
             var intent = new Intent(this, typeof(OldRunningActivity));
-            /*példa, ha string paramétereket szeretnénk adni az activitynek
-            intent.PutExtra("MyData", "Data from HistoryActivity");*/
+            intent.PutExtra("Running", JsonConvert.SerializeObject(_mItems[e.Position]));
             StartActivity(intent);
         }
 
@@ -73,10 +50,19 @@ namespace Running_Tracker.ViewActivity
         {
             if (item.ItemId == Resource.Id.undo)
             {
-                base.OnBackPressed();
+                OnBackPressed();
             }
 
             return base.OnOptionsItemSelected(item);
+        }
+
+        protected override void OnResume()
+        {
+            base.OnResume();
+
+            _mItems = model.LoadPreviousRunnings();
+            _adapter = new ArrayAdapter<RunningData>(this, Android.Resource.Layout.SimpleListItem1, _mItems);
+            _mListVIew.Adapter = _adapter;
         }
     }
 }
