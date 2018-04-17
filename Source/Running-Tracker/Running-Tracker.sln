@@ -5,6 +5,11 @@ VisualStudioVersion = 15.0.27130.2036
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Running-Tracker", "Running-Tracker\Running-Tracker.csproj", "{32FE53FC-D8EE-4E1E-844C-F6A64A66CB50}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UnitTest", "UnitTest\UnitTest.csproj", "{C1C12B24-8097-4E28-A23F-6EEDBDCA4150}"
+	ProjectSection(ProjectDependencies) = postProject
+		{32FE53FC-D8EE-4E1E-844C-F6A64A66CB50} = {32FE53FC-D8EE-4E1E-844C-F6A64A66CB50}
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -17,6 +22,10 @@ Global
 		{32FE53FC-D8EE-4E1E-844C-F6A64A66CB50}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{32FE53FC-D8EE-4E1E-844C-F6A64A66CB50}.Release|Any CPU.Build.0 = Release|Any CPU
 		{32FE53FC-D8EE-4E1E-844C-F6A64A66CB50}.Release|Any CPU.Deploy.0 = Release|Any CPU
+		{C1C12B24-8097-4E28-A23F-6EEDBDCA4150}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C1C12B24-8097-4E28-A23F-6EEDBDCA4150}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C1C12B24-8097-4E28-A23F-6EEDBDCA4150}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C1C12B24-8097-4E28-A23F-6EEDBDCA4150}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
