@@ -81,7 +81,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Minimum length of same color route.
         /// </summary>
-        public const int MinLengthOfSameColor = 5;
+        public const int MinLengthOfSameColor = 10;
 
         #endregion
 
