@@ -1,5 +1,4 @@
-﻿using Android.Gms.Maps.Model;
-using System;
+﻿using System;
 using System.Collections.Generic;
 
 namespace Running_Tracker.Persistence

@@ -7,16 +7,11 @@ namespace Running_Tracker.Model
     /// </summary>
     public class TimeSpanArgs : EventArgs
     {
-        private TimeSpan timeSpan;
-
         public TimeSpanArgs(TimeSpan timeSpan)
         {
-            this.timeSpan = timeSpan;
+            Time = timeSpan;
         }
 
-        public TimeSpan Time
-        {
-            get { return timeSpan; }
-        }
+        public TimeSpan Time { get; }
     }
 }

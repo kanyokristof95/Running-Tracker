@@ -89,7 +89,7 @@ namespace Running_Tracker.Model
 
         public RunningTrackerModel(IRunningTrackerDataAccess runningTrackerDataAccess = null)
         {
-            this._runningTrackerDataAccess = runningTrackerDataAccess;
+            _runningTrackerDataAccess = runningTrackerDataAccess;
             _runningData = null;
 
             _runningTimer = new Timer
@@ -314,7 +314,7 @@ namespace Running_Tracker.Model
                 _runningTimer.Start();
             } else
             {
-                throw new gpsNotReadyException();
+                throw new GpsNotReadyException();
             }
         }
         

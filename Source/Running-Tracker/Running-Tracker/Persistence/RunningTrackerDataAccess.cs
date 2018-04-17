@@ -12,8 +12,6 @@ namespace Running_Tracker.Persistence
     /// </summary>
     class RunningTrackerDataAccess : IRunningTrackerDataAccess
     {
-        public RunningTrackerDataAccess() {}
-
         /// <summary>
         /// Returns the previous saved runnings.
         /// </summary>

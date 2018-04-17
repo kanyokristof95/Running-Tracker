@@ -7,16 +7,11 @@ namespace Running_Tracker.Model
     /// </summary>
     public class WarningArgs : EventArgs
     {
-        private WarningType warningType;
-
         public WarningArgs(WarningType warningType)
         {
-            this.warningType = warningType;
+            Warning = warningType;
         }
 
-        public WarningType Warning
-        {
-            get { return warningType; }
-        }
+        public WarningType Warning { get; }
     }
 }
