@@ -8,7 +8,6 @@ using Android.Runtime;
 using Android.Gms.Maps;
 using Android.Gms.Maps.Model;
 using System;
-using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using Android.Graphics;
@@ -162,7 +161,7 @@ namespace Running_Tracker.ViewActivity
                         _mainButtonState = MainButtonStates.Stop;
                         _mainButton.Text = "Stop";
                     }
-                    catch (gpsNotReadyException)
+                    catch (GpsNotReadyException)
                     {
                         Toast.MakeText(this, "GPS is not calibrated.", ToastLength.Long).Show();
                     }
