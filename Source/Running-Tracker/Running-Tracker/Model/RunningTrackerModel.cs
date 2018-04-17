@@ -81,7 +81,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Minimum length of same color route.
         /// </summary>
-        public const int MinLengthOfSameColor = 10;
+        public const int MinLengthOfSameColor = 7;
 
         #endregion
 
@@ -146,6 +146,8 @@ namespace Running_Tracker.Model
                     }
                     return;
                 }
+
+                OnUserPosition(new LocationData(location.Longitude, location.Latitude));
 
                 // Reduce the warning frequencies
                 if (_speedWarningFrequency > 0)
@@ -222,11 +224,7 @@ namespace Running_Tracker.Model
 
                 if (_remaningSameColor == 0)
                 {
-                    if (_previousLocation == null)
-                    {
-                        runningSpeed = RunningSpeed.StartPoint;
-                    }
-                    else if (speed < CurrentWarningValues.MinimumSpeed)
+                    if (speed < CurrentWarningValues.MinimumSpeed)
                     {
                         runningSpeed = RunningSpeed.Slow;
                     }
