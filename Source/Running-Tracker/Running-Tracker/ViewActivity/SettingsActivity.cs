@@ -21,13 +21,16 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.Settings);
 
+            //Toolbar settings
             Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Settings";
 
+            //Load the precious values
             PersonalData personalData = model.CurrentPersonalDatas;
             WarningValues warningValues = model.CurrentWarningValues;
 
+            //Search the items on the view
             EditText heightBox = FindViewById<EditText>(Resource.Id.height);
             EditText weightBox = FindViewById<EditText>(Resource.Id.weight);
             EditText distanceBox = FindViewById<EditText>(Resource.Id.distance);
@@ -37,7 +40,7 @@ namespace Running_Tracker.ViewActivity
             RadioButton sexMaleBox = FindViewById<RadioButton>(Resource.Id.sexMale);
             RadioButton sexFemaleBox = FindViewById<RadioButton>(Resource.Id.sexFemale);
 
-
+            //Show the previously saved values
             if (personalData!= null & warningValues != null)
             {
                 heightBox.Text = personalData.Height.ToString();
@@ -52,7 +55,7 @@ namespace Running_Tracker.ViewActivity
 
             }
 
-
+            //Save the adjusted values 
             Button saveButton = FindViewById<Button>(Resource.Id.saveButton);
 
             saveButton.Click += delegate
@@ -83,12 +86,20 @@ namespace Running_Tracker.ViewActivity
 
         }
 
+        /// <summary>
+        /// Load menu from the resources
+        /// </summary>
+        /// <param name="menu"></param>
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.undo_menu, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
+        /// <summary>
+        /// Handle the click on menuitem
+        /// </summary>
+        /// <param name="item"></param>
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if(item.ItemId == Resource.Id.undo)

@@ -23,16 +23,22 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.History);
 
-            // Toolbar
+            //Toolbar settings
             var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "History";
 
-            // Listview
+            //Listview settings
             _mListVIew = FindViewById<ListView>(Resource.Id.myListView);
             _mListVIew.ItemClick += MListVIew_ItemClick;
         }
-        
+
+
+        /// <summary>
+        /// Open a previously saved run
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void MListVIew_ItemClick(object sender, AdapterView.ItemClickEventArgs e)
         {
             var intent = new Intent(this, typeof(OldRunningActivity));
@@ -40,12 +46,20 @@ namespace Running_Tracker.ViewActivity
             StartActivity(intent);
         }
 
+        /// <summary>
+        /// Load the menu from resource
+        /// </summary>
+        /// <param name="menu"></param>
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.undo_menu, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
+        /// <summary>
+        /// If we click the undo menuitem, navigate back to the main menu
+        /// </summary>
+        /// <param name="item"></param>
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             if (item.ItemId == Resource.Id.undo)
@@ -56,6 +70,9 @@ namespace Running_Tracker.ViewActivity
             return base.OnOptionsItemSelected(item);
         }
 
+        /// <summary>
+        /// Load the previous runnings, and show on listview
+        /// </summary>
         protected override void OnResume()
         {
             base.OnResume();

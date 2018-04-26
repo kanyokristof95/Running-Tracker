@@ -23,6 +23,8 @@ namespace Running_Tracker.ViewActivity
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
+
+            //create a model instance
             model = new RunningTrackerModel(new RunningTrackerDataAccess());   
         }
     }

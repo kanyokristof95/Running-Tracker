@@ -27,12 +27,12 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.OldRunning);
 
-            // Toolbar
+            // Toolbar settings
             var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Run details";
             
-            // Map
+            // Map settings
             _mapFragment = FragmentManager.FindFragmentByTag("map") as MapFragment;
 
             if (_mapFragment == null)
@@ -51,22 +51,32 @@ namespace Running_Tracker.ViewActivity
 
         }
 
+        /// <summary>
+        /// Load the menu from resources
+        /// </summary>
+        /// <param name="menu"></param>
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.old_running_menu, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
+        /// <summary>
+        /// Show the runtrack on the map, and set in the view the other rundetails. 
+        /// </summary>
+        /// <param name="map"></param>
         public void OnMapReady(GoogleMap map)
         {
             _map = map;
             _running = JsonConvert.DeserializeObject<RunningData>(Intent.GetStringExtra("Running"));
 
+            //set the camera
             var b = new LatLngBounds.Builder()
                 .Include(new LatLng(_running.MinLatitude, _running.MinLongitude))
                 .Include(new LatLng(_running.MaxLatitude, _running.MaxLongitude));
             _map.MoveCamera(CameraUpdateFactory.NewLatLngBounds(b.Build(), 120));
             
+            //set the runtrack
             var lastPointSpeedType = RunningSpeed.StartPoint;
 
             PolylineOptions polylineOptions = null;
@@ -115,6 +125,7 @@ namespace Running_Tracker.ViewActivity
             
             _map.AddPolyline(polylineOptions);
 
+            //set the resting points
             foreach (var circle in _running.Stops)
             {
                 var circleOptions = new CircleOptions();
@@ -128,6 +139,7 @@ namespace Running_Tracker.ViewActivity
                 _map.AddCircle(circleOptions);
             }
 
+            //set other rundetails
             var hour = _running.Duration.Hours;
             var min = _running.Duration.Minutes;
             var sec = _running.Duration.Seconds;
@@ -140,6 +152,10 @@ namespace Running_Tracker.ViewActivity
             FindViewById<TextView>(Resource.Id.calorie).Text = Math.Round(_running.Calorie, 2).ToString(CultureInfo.InvariantCulture);
         }
 
+        /// <summary>
+        /// Handle the click on menuitem.
+        /// </summary>
+        /// <param name="item"></param>
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
 

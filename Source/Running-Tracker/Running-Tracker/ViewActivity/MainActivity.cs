@@ -56,7 +56,7 @@ namespace Running_Tracker.ViewActivity
             SetContentView(Resource.Layout.Main);
             Window.SetFlags(WindowManagerFlags.KeepScreenOn, WindowManagerFlags.KeepScreenOn);
 
-            // Toolbar
+            // Toolbar settings
             var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Running Tracker";
@@ -330,15 +330,6 @@ namespace Running_Tracker.ViewActivity
             circleOptions.InvokeZIndex(11);
             
             _userPosition = _map.AddCircle(circleOptions);
-
-
-
-            /*
-            ValueAnimator animator = ValueAnimator.OfFloat(0, 1);
-            animator.SetDuration(1000);
-            animator.Start();
-            animator.Update += Animator_Update;
-            */
         }
 
         /// <summary>
@@ -402,22 +393,6 @@ namespace Running_Tracker.ViewActivity
                 model.Calibrate();
             }
         }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
         /// <summary>
         /// GPS provider is disabled
@@ -510,12 +485,20 @@ namespace Running_Tracker.ViewActivity
             _locationManager.RemoveUpdates(this);
         }
 
+        /// <summary>
+        /// Load the menu from resource
+        /// </summary>
+        /// <param name="menu"></param>
         public override bool OnCreateOptionsMenu(IMenu menu)
         {
             MenuInflater.Inflate(Resource.Menu.main_menu, menu);
             return base.OnCreateOptionsMenu(menu);
         }
 
+        /// <summary>
+        /// Handle the click on menuitem. 
+        /// </summary>
+        /// <param name="item"></param>
         public override bool OnOptionsItemSelected(IMenuItem item)
         {
             Intent intent = null;
