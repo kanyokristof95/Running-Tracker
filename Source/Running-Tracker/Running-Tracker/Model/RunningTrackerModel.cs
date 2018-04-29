@@ -378,37 +378,64 @@ namespace Running_Tracker.Model
         /// </summary>
         public event EventHandler<WarningArgs> Warning;
 
-
+        /// <summary>
+        /// Sends the NewPosition signal.
+        /// </summary>
+        /// <param name="location">User's current location</param>
         private void OnNewPosition(LocationData location)
         {
             NewPosition?.Invoke(this, new PositionArgs(location));
         }
 
+        /// <summary>
+        /// Sends the UserPosition signal.
+        /// </summary>
+        /// <param name="location">User's current location</param>
         private void OnUserPosition(LocationData location)
         {
             UserPosition?.Invoke(this, new PositionArgs(location));
         }
 
+        /// <summary>
+        /// Sends UserStopped signal.
+        /// </summary>
+        /// <param name="location">User's current location</param>
         private void OnUserStopped(LocationData location)
         {
             UserStopped?.Invoke(this, new PositionArgs(location));
         }
 
+        /// <summary>
+        /// Sends the CameraPosition signal.
+        /// </summary>
+        /// <param name="location">User's current position</param>
         private void OnCameraPosition(LocationData location)
         {
             CameraPosition?.Invoke(this, new PositionArgs(location));
         }
-
+    
+        /// <summary>
+        /// Sends the CurrentRunningDuration signal.
+        /// </summary>
+        /// <param name="timeSpan">Running's duratiion</param>
         private void OnCurrentRunningDuration(TimeSpan timeSpan)
         {
             CurrentRunningDuration?.Invoke(this, new TimeSpanArgs(timeSpan));
         }
 
+        /// <summary>
+        /// Sends the Warning signal.
+        /// </summary>
+        /// <param name="warning">Warning's type</param>
         private void OnWarning(WarningType warning)
         {
             Warning?.Invoke(this, new WarningArgs(warning));
         }
         
+        /// <summary>
+        /// Sends the GpsReady signal.
+        /// </summary>
+        /// <param name="location">User's position</param>
         private void OnGPS_Ready(LocationData location)
         {
             GpsReady?.Invoke(this, new PositionArgs(location));

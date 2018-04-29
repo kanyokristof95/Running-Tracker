@@ -77,7 +77,7 @@ namespace Running_Tracker.ViewActivity
         {
             base.OnResume();
 
-            _mItems = model.LoadPreviousRunnings();
+            _mItems = Model.LoadPreviousRunnings();
             _adapter = new ArrayAdapter<RunningData>(this, Android.Resource.Layout.SimpleListItem1, _mItems);
             _mListVIew.Adapter = _adapter;
         }

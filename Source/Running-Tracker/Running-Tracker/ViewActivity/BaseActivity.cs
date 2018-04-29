@@ -18,14 +18,14 @@ namespace Running_Tracker.ViewActivity
     [Activity(Label = "BaseActivity")]
     public class BaseActivity : AppCompatActivity
     {
-        protected RunningTrackerModel model;
+        protected RunningTrackerModel Model;
         
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
 
-            //create a model instance
-            model = new RunningTrackerModel(new RunningTrackerDataAccess());   
+            // Create a model instance
+            Model = new RunningTrackerModel(new RunningTrackerDataAccess());   
         }
     }
 }

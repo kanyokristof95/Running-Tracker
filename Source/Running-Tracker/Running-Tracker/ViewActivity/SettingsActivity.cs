@@ -1,13 +1,11 @@
-﻿
-using Android.App;
-using Android.Content;
+﻿using Android.App;
 using Android.Content.PM;
 using Android.OS;
-using Android.Support.V7.App;
 using Android.Views;
 using Android.Widget;
 using Running_Tracker.Persistence;
 using System;
+using System.Globalization;
 
 namespace Running_Tracker.ViewActivity
 {
@@ -21,69 +19,64 @@ namespace Running_Tracker.ViewActivity
 
             SetContentView(Resource.Layout.Settings);
 
-            //Toolbar settings
-            Android.Support.V7.Widget.Toolbar mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
+            // Toolbar settings
+            var mToolbar = FindViewById<Android.Support.V7.Widget.Toolbar>(Resource.Id.toolbar);
             SetSupportActionBar(mToolbar);
             SupportActionBar.Title = "Settings";
 
-            //Load the precious values
-            PersonalData personalData = model.CurrentPersonalDatas;
-            WarningValues warningValues = model.CurrentWarningValues;
+            // Load the precious values
+            var personalData = Model.CurrentPersonalDatas;
+            var warningValues = Model.CurrentWarningValues;
 
-            //Search the items on the view
-            EditText heightBox = FindViewById<EditText>(Resource.Id.height);
-            EditText weightBox = FindViewById<EditText>(Resource.Id.weight);
-            EditText distanceBox = FindViewById<EditText>(Resource.Id.distance);
-            EditText timeBox = FindViewById<EditText>(Resource.Id.time);
-            EditText minSpeedBox = FindViewById<EditText>(Resource.Id.minSpeed);
-            EditText maxSpeedBox = FindViewById<EditText>(Resource.Id.maxSpeed);
-            RadioButton sexMaleBox = FindViewById<RadioButton>(Resource.Id.sexMale);
-            RadioButton sexFemaleBox = FindViewById<RadioButton>(Resource.Id.sexFemale);
+            // Search the items on the view
+            var heightBox = FindViewById<EditText>(Resource.Id.height);
+            var weightBox = FindViewById<EditText>(Resource.Id.weight);
+            var distanceBox = FindViewById<EditText>(Resource.Id.distance);
+            var timeBox = FindViewById<EditText>(Resource.Id.time);
+            var minSpeedBox = FindViewById<EditText>(Resource.Id.minSpeed);
+            var maxSpeedBox = FindViewById<EditText>(Resource.Id.maxSpeed);
+            var sexMaleBox = FindViewById<RadioButton>(Resource.Id.sexMale);
+            var sexFemaleBox = FindViewById<RadioButton>(Resource.Id.sexFemale);
 
-            //Show the previously saved values
+            // Show the previously saved values
             if (personalData!= null & warningValues != null)
             {
                 heightBox.Text = personalData.Height.ToString();
                 weightBox.Text = personalData.Weight.ToString();
-                distanceBox.Text = warningValues.Distance.ToString();
-                minSpeedBox.Text = warningValues.MinimumSpeed.ToString();
-                maxSpeedBox.Text = warningValues.MaximumSpeed.ToString();
-                timeBox.Text = warningValues.Time.TotalMinutes.ToString();
+                distanceBox.Text = warningValues.Distance.ToString(CultureInfo.InvariantCulture);
+                minSpeedBox.Text = warningValues.MinimumSpeed.ToString(CultureInfo.InvariantCulture);
+                maxSpeedBox.Text = warningValues.MaximumSpeed.ToString(CultureInfo.InvariantCulture);
+                timeBox.Text = warningValues.Time.TotalMinutes.ToString(CultureInfo.InvariantCulture);
                 sexMaleBox.Checked = personalData.Sex.Equals(Gender.Male);
                 sexFemaleBox.Checked = personalData.Sex.Equals(Gender.Female);
-
-
             }
 
             //Save the adjusted values 
-            Button saveButton = FindViewById<Button>(Resource.Id.saveButton);
+            var saveButton = FindViewById<Button>(Resource.Id.saveButton);
 
             saveButton.Click += delegate
             {
-                Gender sex = sexMaleBox.Checked ? Gender.Male : Gender.Female;
+                var sex = sexMaleBox.Checked ? Gender.Male : Gender.Female;
 
                 personalData = new PersonalData
                 {
-                    Height = Int32.Parse(heightBox.Text),
-                    Weight = Int32.Parse(weightBox.Text),
+                    Height = int.Parse(heightBox.Text),
+                    Weight = int.Parse(weightBox.Text),
                     Sex = sex
                 };
 
                 warningValues = new WarningValues
                 {
-                    Distance = Int32.Parse(distanceBox.Text),
-                    Time = new TimeSpan(0, Int32.Parse(timeBox.Text), 0),
-                    MinimumSpeed = Int32.Parse(minSpeedBox.Text),
-                    MaximumSpeed = Int32.Parse(maxSpeedBox.Text)
+                    Distance = int.Parse(distanceBox.Text),
+                    Time = new TimeSpan(0, int.Parse(timeBox.Text), 0),
+                    MinimumSpeed = int.Parse(minSpeedBox.Text),
+                    MaximumSpeed = int.Parse(maxSpeedBox.Text)
 
                 };
-                model.SaveSettings(personalData, warningValues);
+                Model.SaveSettings(personalData, warningValues);
 
                 Toast.MakeText(this, "Successful saving!", ToastLength.Long).Show();
-
             };
-
-
         }
 
         /// <summary>
@@ -104,11 +97,10 @@ namespace Running_Tracker.ViewActivity
         {
             if(item.ItemId == Resource.Id.undo)
             {
-                base.OnBackPressed();
+                OnBackPressed();
             }
 
             return base.OnOptionsItemSelected(item);
         }
     }
-
 }

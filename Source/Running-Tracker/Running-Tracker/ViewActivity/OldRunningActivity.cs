@@ -174,7 +174,7 @@ namespace Running_Tracker.ViewActivity
 
                 alertDialog.SetPositiveButton("Yes", delegate
                 {
-                    model.DeleteRunning(_running);
+                    Model.DeleteRunning(_running);
                     OnBackPressed();
                 });
                 alertDialog.Show();

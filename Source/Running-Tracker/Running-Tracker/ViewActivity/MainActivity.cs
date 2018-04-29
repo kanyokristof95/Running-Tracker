@@ -48,7 +48,7 @@ namespace Running_Tracker.ViewActivity
         private TextView _speedTextView;
         private TextView _distanceTextView;
         private double _sumDistance;
-        
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -109,12 +109,12 @@ namespace Running_Tracker.ViewActivity
             MoveCamera(new LatLng(47.162494, 19.503304), 6);
 
             // Event handlers
-            model.CurrentRunningDuration += Model_CurrentTimeSpan;
-            model.Warning += Model_Warning;
-            model.UserPosition += Model_UserPosition;
-            model.GpsReady += Model_GPS_Ready;
-            model.NewPosition += Model_NewPosition;
-            model.UserStopped += Model_UserStopped;
+            Model.CurrentRunningDuration += Model_CurrentTimeSpan;
+            Model.Warning += Model_Warning;
+            Model.UserPosition += Model_UserPosition;
+            Model.GpsReady += Model_GPS_Ready;
+            Model.NewPosition += Model_NewPosition;
+            Model.UserStopped += Model_UserStopped;
         }
 
         /// <summary>
@@ -129,7 +129,7 @@ namespace Running_Tracker.ViewActivity
             DrawUser();
             MoveCamera(position, 16, false);
 
-            if (!model.IsRunning)
+            if (!Model.IsRunning)
             {
                 _mainButton.Text = "Start";
                 _mainButtonState = MainButtonStates.Start;
@@ -151,7 +151,7 @@ namespace Running_Tracker.ViewActivity
                 case MainButtonStates.Start:
                     try
                     {
-                        model.StartRunning();
+                        Model.StartRunning();
                         _userPosition?.Remove();
                         _userPosition = null;
                         _map.Clear();
@@ -167,7 +167,7 @@ namespace Running_Tracker.ViewActivity
                     }
                     break;
                 case MainButtonStates.Stop:
-                    var saved = model.StopRunning();
+                    var saved = Model.StopRunning();
                     _mainButtonState = MainButtonStates.Start;
                     _mainButton.Text = "Start";
                     if (saved)
@@ -352,7 +352,7 @@ namespace Running_Tracker.ViewActivity
             var cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
             
             if(animate)
-                _map.AnimateCamera(cameraUpdate, model.GpsMinTime, null);
+                _map.AnimateCamera(cameraUpdate, Model.GpsMinTime, null);
             else
                 _map.MoveCamera(cameraUpdate);
         }
@@ -383,14 +383,14 @@ namespace Running_Tracker.ViewActivity
                     _locationProvider = string.Empty;
                 }
                 
-                _locationManager.RequestLocationUpdates(_locationProvider, model.GpsMinTime, model.GpsMinDistance, this);
+                _locationManager.RequestLocationUpdates(_locationProvider, Model.GpsMinTime, Model.GpsMinDistance, this);
                 
-                if (!model.IsRunning)
+                if (!Model.IsRunning)
                 {
                     _mainButtonState = MainButtonStates.Calibrating;
                     _mainButton.Text = "Calibrating ...";
                 }
-                model.Calibrate();
+                Model.Calibrate();
             }
         }
 
@@ -444,7 +444,7 @@ namespace Running_Tracker.ViewActivity
         /// <param name="location"></param>
         public void OnLocationChanged(Location location)
         {
-            model.ChangeLocation(location);
+            Model.ChangeLocation(location);
         }
 
         /// <summary>
