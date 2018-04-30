@@ -17,14 +17,12 @@ namespace Running_Tracker.Model
         private double _latDistance;
         private double _lngDistance;
         
-        public UserPositionTimer(int fps, int gpsMinTime)
+        public UserPositionTimer(int fps)
         {
             _count = 0;
-            
             _fps = fps;
 
-            var interval = gpsMinTime / fps;
-            _timer = new Timer { Interval = interval };
+            _timer = new Timer {Interval = 1000 / fps};
             _timer.Elapsed += TimerOnElapsed;
         }
         
