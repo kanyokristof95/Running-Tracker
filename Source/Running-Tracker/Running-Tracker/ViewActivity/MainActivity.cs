@@ -81,7 +81,7 @@ namespace Running_Tracker.ViewActivity
             _lastRunningSpeedType = RunningSpeed.StartPoint;
 
             // Current position timer
-            _currentPositionTimer = new UserPositionTimer(Fps);
+            _currentPositionTimer = new UserPositionTimer(Fps, Model.GpsMinTime);
             _currentPositionTimer.Elapsed += CurrentPositionTimerOnElapsed;
 
             // Eventhandler
