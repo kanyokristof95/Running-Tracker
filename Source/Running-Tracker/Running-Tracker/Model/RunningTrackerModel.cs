@@ -51,7 +51,7 @@ namespace Running_Tracker.Model
         /// <summary>
         /// Mode of application's running.
         /// </summary>
-        private const bool Debug = false;
+        private const bool Debug = true;
 
         /// <summary>
         /// The number of position calibrating.
@@ -142,7 +142,6 @@ namespace Running_Tracker.Model
                     if(location.Speed > 0)
                     {
                         OnUserPosition(new LocationData(location.Longitude, location.Latitude));
-                        OnCameraPosition(new LocationData(location.Longitude, location.Latitude));
                     }
                     return;
                 }
@@ -362,12 +361,7 @@ namespace Running_Tracker.Model
         /// This signal is sent when the user stopped.
         /// </summary>
         public event EventHandler<PositionArgs> UserStopped;
-
-        /// <summary>
-        /// This signal contains the new camera position
-        /// </summary>
-        public event EventHandler<PositionArgs> CameraPosition;
-
+        
         /// <summary>
         /// This signal is sent continously during the running. It contains the duration of current running.
         /// </summary>
@@ -403,15 +397,6 @@ namespace Running_Tracker.Model
         private void OnUserStopped(LocationData location)
         {
             UserStopped?.Invoke(this, new PositionArgs(location));
-        }
-
-        /// <summary>
-        /// Sends the CameraPosition signal.
-        /// </summary>
-        /// <param name="location">User's current position</param>
-        private void OnCameraPosition(LocationData location)
-        {
-            CameraPosition?.Invoke(this, new PositionArgs(location));
         }
     
         /// <summary>
