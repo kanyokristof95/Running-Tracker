@@ -97,6 +97,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Model\gpsNotReadyException.cs" />
+    <Compile Include="Model\UserPositionTimer.cs" />
     <Compile Include="Persistence\Coordinate.cs" />
     <Compile Include="Persistence\RunningSpeed.cs" />
     <Compile Include="Model\TimeSpanArgs.cs" />

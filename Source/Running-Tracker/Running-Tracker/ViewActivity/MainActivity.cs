@@ -12,6 +12,7 @@ using System.Globalization;
 using System.Linq;
 using Android.Graphics;
 using Android.Content.PM;
+using System.Timers;
 using Running_Tracker.Model;
 using Running_Tracker.Persistence;
 
@@ -49,6 +50,9 @@ namespace Running_Tracker.ViewActivity
         private TextView _distanceTextView;
         private double _sumDistance;
 
+        private UserPositionTimer _currentPositionTimer;
+        private const int Fps = 30;
+
         protected override void OnCreate(Bundle savedInstanceState)
         {
             base.OnCreate(savedInstanceState);
@@ -76,6 +80,10 @@ namespace Running_Tracker.ViewActivity
             _userPosition = null;
             _lastRunningSpeedType = RunningSpeed.StartPoint;
 
+            // Current position timer
+            _currentPositionTimer = new UserPositionTimer(Fps);
+            _currentPositionTimer.Elapsed += CurrentPositionTimerOnElapsed;
+
             // Eventhandler
             _mainButton.Click += MainButton_Clicked;
 
@@ -97,7 +105,7 @@ namespace Running_Tracker.ViewActivity
 
             _mapFragment.GetMapAsync(this);
         }
-
+        
         /// <summary>
         /// Map is ready to use
         /// </summary>
@@ -126,7 +134,7 @@ namespace Running_Tracker.ViewActivity
         {
             var position = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
             _lastUserPosition = position;
-            DrawUser();
+            DrawUser(_lastUserPosition);
             MoveCamera(position, 16, false);
 
             if (!Model.IsRunning)
@@ -155,7 +163,7 @@ namespace Running_Tracker.ViewActivity
                         _userPosition?.Remove();
                         _userPosition = null;
                         _map.Clear();
-                        DrawUser();
+                        DrawUser(_lastUserPosition);
                         _distanceTextView.Text = "0";
                         _speedTextView.Text = "0";
                         _mainButtonState = MainButtonStates.Stop;
@@ -183,9 +191,8 @@ namespace Running_Tracker.ViewActivity
         /// </summary>
         private void Model_UserPosition(object sender, PositionArgs e)
         {
-
-            _lastUserPosition = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
-            DrawUser();
+            var previousUserPosition = _lastUserPosition;
+            _currentPositionTimer.Start(previousUserPosition, new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
             MoveCamera(_lastUserPosition, null);
         }
 
@@ -196,6 +203,7 @@ namespace Running_Tracker.ViewActivity
         /// <param name="e">User's new position</param>
         private void Model_NewPosition(object sender, PositionArgs e)
         {
+
             var position = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
 
             // Refresh texts
@@ -240,11 +248,13 @@ namespace Running_Tracker.ViewActivity
                     _polylineOptions.Add(lastPosition);
             }
             _polylineOptions.Add(position);
-
-            var currentPolyline = _map.AddPolyline(_polylineOptions);
-            _previousStateOfCurrentPolyline?.Remove();
-
-            _previousStateOfCurrentPolyline = currentPolyline;
+            
+            RunOnUiThread(() =>
+            {
+                var currentPolyline = _map.AddPolyline(_polylineOptions);
+                _previousStateOfCurrentPolyline?.Remove();
+                _previousStateOfCurrentPolyline = currentPolyline;
+            });
 
             // Move camera
             MoveCamera(position, null);
@@ -282,8 +292,11 @@ namespace Running_Tracker.ViewActivity
             circleOptions.InvokeStrokeWidth(1);
             circleOptions.InvokeZIndex(10);
 
-            _map.AddCircle(circleOptions);
-            _speedTextView.Text = "0";
+            RunOnUiThread(() =>
+            {
+                _map.AddCircle(circleOptions);
+                _speedTextView.Text = "0";
+            });
         }
         
         /// <summary>
@@ -312,25 +325,41 @@ namespace Running_Tracker.ViewActivity
                     break;
             }
         }
+
+        /// <summary>
+        /// Draw the animated user position.
+        /// </summary>
+        /// <param name="sender">Sender object</param>
+        /// <param name="positionArgs">User's position at the current frame</param>
+        private void CurrentPositionTimerOnElapsed(object sender, PositionArgs positionArgs)
+        {
+            _lastUserPosition = new LatLng(positionArgs.LocationData.Latitude, positionArgs.LocationData.Longitude);
+            DrawUser(_lastUserPosition);
+        }
         
         /// <summary>
         /// Delete the previous user circle and draw the new one
         /// </summary>
         /// <param name="position">User's new position</param>
-        private void DrawUser()
+        private void DrawUser(LatLng position)
         {
-            _userPosition?.Remove();
 
             var circleOptions = new CircleOptions();
-            circleOptions.InvokeCenter(_lastUserPosition);
+            circleOptions.InvokeCenter(position);
             circleOptions.InvokeRadius(9);
             circleOptions.InvokeFillColor(Color.Rgb(69, 140, 228));
             circleOptions.InvokeStrokeColor(Color.White);
             circleOptions.InvokeStrokeWidth(2);
             circleOptions.InvokeZIndex(11);
             
-            _userPosition = _map.AddCircle(circleOptions);
+            RunOnUiThread(() =>
+            {
+                var newUserPosition = _map.AddCircle(circleOptions);
+                _userPosition?.Remove();
+                _userPosition = newUserPosition;
+            });
         }
+
 
         /// <summary>
         /// Move the camera into the user's position
@@ -340,21 +369,24 @@ namespace Running_Tracker.ViewActivity
         /// <param name="animate">Animate</param>
         private void MoveCamera(LatLng location, float? zoom, bool animate = true)
         {
-            var builder = CameraPosition.InvokeBuilder();
-            builder.Target(location);
+            RunOnUiThread(() =>
+            {
+                var builder = CameraPosition.InvokeBuilder();
+                builder.Target(location);
 
-            if (zoom != null)
-                builder.Zoom((float)zoom);
-            else
-                builder.Zoom(_map.CameraPosition.Zoom);
+                if (zoom != null)
+                    builder.Zoom((float)zoom);
+                else
+                    builder.Zoom(_map.CameraPosition.Zoom);
 
-            var cameraPosition = builder.Build();
-            var cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
+                var cameraPosition = builder.Build();
+                var cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
             
-            if(animate)
-                _map.AnimateCamera(cameraUpdate, Model.GpsMinTime, null);
-            else
-                _map.MoveCamera(cameraUpdate);
+                if(animate)
+                    _map.AnimateCamera(cameraUpdate, Model.GpsMinTime, null);
+                else
+                    _map.MoveCamera(cameraUpdate);
+            });
         }
 
         /// <summary>
