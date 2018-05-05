@@ -178,6 +178,7 @@ namespace Running_Tracker.ViewActivity
                         _map.Clear();
                         DrawUser(_lastUserPosition);
                         _distanceTextView.Text = "0";
+                        _sumDistance = 0;
                         _speedTextView.Text = "0";
                         _mainButtonState = MainButtonStates.Stop;
                         _mainButton.Text = "Stop";
