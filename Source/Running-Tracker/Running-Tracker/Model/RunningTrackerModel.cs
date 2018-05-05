@@ -34,6 +34,8 @@ namespace Running_Tracker.Model
         private Location _previousLocation;
         private Location _currentLocation;
 
+        private bool _runningEnd;
+
         #endregion
 
         #region Default values
@@ -91,6 +93,7 @@ namespace Running_Tracker.Model
         {
             _runningTrackerDataAccess = runningTrackerDataAccess;
             _runningData = null;
+            _runningEnd = false;
 
             _runningTimer = new Timer
             {
@@ -105,6 +108,9 @@ namespace Running_Tracker.Model
 
         #region Private Methods
 
+        /// <summary>
+        /// Current running duration
+        /// </summary>
         private void RunningTime_Elapsed(object sender, ElapsedEventArgs e)
         {
             if (_runningData != null)
@@ -120,7 +126,7 @@ namespace Running_Tracker.Model
         /// </summary>
         /// <param name="location">New location</param>
         public void ChangeLocation(Location location)
-        {
+        {   
             if(_remaningCalibratingLocation > 0)
             {
                 // Calibrating the gps
@@ -132,6 +138,8 @@ namespace Running_Tracker.Model
             } else
             {
                 // The gps is calibrated
+                if (_runningEnd)
+                    return;
 
                 if (location.Accuracy > DefaultGpsAccuracy)
                     return;
@@ -301,6 +309,7 @@ namespace Running_Tracker.Model
         {
             if (_remaningCalibratingLocation == 0)
             {
+                _runningEnd = false;
                 _runningData = new RunningData(CurrentPersonalDatas);
                 _speedWarningFrequency = SpeedWarningFrequency;
                 _distanceWarningYet = false;
@@ -327,6 +336,7 @@ namespace Running_Tracker.Model
             {
                 _runningData.Finish();
                 _runningTimer.Stop();
+                _runningEnd = true;
                 bool ret = SaveRunning(_runningData);
                 _runningData = null;
                 return ret;
@@ -334,6 +344,9 @@ namespace Running_Tracker.Model
             return false;
         }
 
+        /// <summary>
+        /// Save theh personal data and warning values settings
+        /// </summary>
         public void SaveSettings(PersonalData personalData, WarningValues warningValues)
         {
             _runningTrackerDataAccess.CurrentPersonalDatas = personalData;
@@ -495,9 +508,14 @@ namespace Running_Tracker.Model
         }
 
         /// <summary>
-        /// If the user starts the running, it return true
+        /// If the user starts the running, it returns true
         /// </summary>
         public bool IsRunning => _runningData != null;
+
+        /// <summary>
+        /// If the user finished the current running, it returns true
+        /// </summary>
+        public bool RunningEnd =>_runningEnd;
 
         #endregion
     }

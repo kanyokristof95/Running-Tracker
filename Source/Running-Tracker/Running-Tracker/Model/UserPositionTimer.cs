@@ -22,7 +22,7 @@ namespace Running_Tracker.Model
             _count = 0;
             _fps = fps;
 
-            var interval = gpsMinTime / fps;
+            var interval = (1000 / fps) * (1000.0 / gpsMinTime);
             _timer = new Timer {Interval = interval};
             _timer.Elapsed += TimerOnElapsed;
         }

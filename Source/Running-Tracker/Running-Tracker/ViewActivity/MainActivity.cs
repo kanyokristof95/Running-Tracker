@@ -41,6 +41,8 @@ namespace Running_Tracker.ViewActivity
         private LocationManager _locationManager;
         private string _locationProvider;
 
+        private CameraPosition.Builder _builder;
+
         // View elements
         private Dialog _dialog;
         private Button _mainButton;
@@ -94,8 +96,11 @@ namespace Running_Tracker.ViewActivity
             {
                 var mapOptions = new GoogleMapOptions()
                     .InvokeMapType(GoogleMap.MapTypeNormal)
-                    .InvokeZoomControlsEnabled(true)
-                    .InvokeCompassEnabled(true);
+                    .InvokeZoomControlsEnabled(false)
+                    .InvokeZoomGesturesEnabled(true)
+                    .InvokeScrollGesturesEnabled(false)
+                    .InvokeCompassEnabled(true)
+                    .InvokeZOrderOnTop(false);
 
                 var fragTx = FragmentManager.BeginTransaction();
                 _mapFragment = MapFragment.NewInstance(mapOptions);
@@ -113,6 +118,7 @@ namespace Running_Tracker.ViewActivity
         public void OnMapReady(GoogleMap map)
         {
             _map = map;
+            _builder = CameraPosition.InvokeBuilder();
 
             MoveCamera(new LatLng(47.162494, 19.503304), 6);
 
@@ -132,12 +138,15 @@ namespace Running_Tracker.ViewActivity
         /// <param name="e">New position</param>
         private void Model_GPS_Ready(object sender, PositionArgs e)
         {
-            var position = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
-            _lastUserPosition = position;
-            DrawUser(_lastUserPosition);
-            MoveCamera(position, 16, false);
+            if (!Model.RunningEnd)
+            {
+                var position = new LatLng(e.LocationData.Latitude, e.LocationData.Longitude);
+                _lastUserPosition = position;
+                DrawUser(_lastUserPosition);
+                MoveCamera(position, 16);
+            }
 
-            if (!Model.IsRunning)
+        if (!Model.IsRunning)
             {
                 _mainButton.Text = "Start";
                 _mainButtonState = MainButtonStates.Start;
@@ -159,9 +168,13 @@ namespace Running_Tracker.ViewActivity
                 case MainButtonStates.Start:
                     try
                     {
+                        _lastRunningSpeedType = RunningSpeed.StartPoint;
                         Model.StartRunning();
                         _userPosition?.Remove();
                         _userPosition = null;
+                        _polylineOptions = null;
+                        _previousStateOfCurrentPolyline = null;
+
                         _map.Clear();
                         DrawUser(_lastUserPosition);
                         _distanceTextView.Text = "0";
@@ -193,7 +206,6 @@ namespace Running_Tracker.ViewActivity
         {
             var previousUserPosition = _lastUserPosition;
             _currentPositionTimer.Start(previousUserPosition, new LatLng(e.LocationData.Latitude, e.LocationData.Longitude));
-            MoveCamera(_lastUserPosition, null);
         }
 
         /// <summary>
@@ -248,16 +260,21 @@ namespace Running_Tracker.ViewActivity
                     _polylineOptions.Add(lastPosition);
             }
             _polylineOptions.Add(position);
-            
-            RunOnUiThread(() =>
-            {
-                var currentPolyline = _map.AddPolyline(_polylineOptions);
-                _previousStateOfCurrentPolyline?.Remove();
-                _previousStateOfCurrentPolyline = currentPolyline;
-            });
 
-            // Move camera
-            MoveCamera(position, null);
+            // Drawing the line
+            var timer = new Timer();
+            timer.Interval = Model.GpsMinTime / 2;
+            timer.Elapsed += (o, args) =>
+            {
+                RunOnUiThread(() =>
+                {
+                    var currentPolyline = _map.AddPolyline(_polylineOptions);
+                    _previousStateOfCurrentPolyline?.Remove();
+                    _previousStateOfCurrentPolyline = currentPolyline;
+                });
+                timer.Stop();
+            };
+            timer.Start();
         }
 
         /// <summary>
@@ -335,6 +352,7 @@ namespace Running_Tracker.ViewActivity
         {
             _lastUserPosition = new LatLng(positionArgs.LocationData.Latitude, positionArgs.LocationData.Longitude);
             DrawUser(_lastUserPosition);
+            MoveCamera(_lastUserPosition, null);
         }
         
         /// <summary>
@@ -366,26 +384,24 @@ namespace Running_Tracker.ViewActivity
         /// </summary>
         /// <param name="location">User's new position</param>
         /// <param name="zoom">Zoom value (if it's null, won't be any zoom)</param>
-        /// <param name="animate">Animate</param>
-        private void MoveCamera(LatLng location, float? zoom, bool animate = true)
+        private void MoveCamera(LatLng location, float? zoom)
         {
             RunOnUiThread(() =>
             {
-                var builder = CameraPosition.InvokeBuilder();
-                builder.Target(location);
+                _builder.Target(location);
 
                 if (zoom != null)
-                    builder.Zoom((float)zoom);
+                    _builder.Zoom((float) zoom);
                 else
-                    builder.Zoom(_map.CameraPosition.Zoom);
+                    _builder.Zoom(_map.CameraPosition.Zoom);
 
-                var cameraPosition = builder.Build();
+                _builder.Bearing(_map.CameraPosition.Bearing);
+
+
+                var cameraPosition = _builder.Build();
                 var cameraUpdate = CameraUpdateFactory.NewCameraPosition(cameraPosition);
-            
-                if(animate)
-                    _map.AnimateCamera(cameraUpdate, Model.GpsMinTime, null);
-                else
-                    _map.MoveCamera(cameraUpdate);
+                
+                _map.MoveCamera(cameraUpdate);
             });
         }
 
