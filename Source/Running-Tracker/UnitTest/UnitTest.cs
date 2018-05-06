@@ -1,5 +1,8 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Running_Tracker.Model;
+using Running_Tracker.Persistence;
+using Moq;
+using System.Collections.Generic;
 
 namespace UnitTest
 {
@@ -13,7 +16,8 @@ namespace UnitTest
         private int value; // Test
 
         #endregion
-
+        private Mock<IRunningTrackerDataAccess> _mock;
+        private RunningTrackerModel _model;
 
         #region Initialize
 
@@ -23,35 +27,38 @@ namespace UnitTest
         [TestInitialize]
         public void Initialize()
         {
-            model = new RunningTrackerModel(null);
+            _mock = new Mock<IRunningTrackerDataAccess>();
+            List<RunningData> testRunningData = new List<RunningData>();
+            testRunningData.Add(new RunningData(new PersonalData()));
+            testRunningData.Add(new RunningData(new PersonalData(Gender.Female, 150, 50)));
+            _mock.Setup(mock => mock.LoadPreviousRunnings()).Returns(testRunningData);
 
-            value = 0; // Test
+            _model = new RunningTrackerModel(_mock.Object);
         }
-
         #endregion
-
 
         #region  Tests
 
         [TestMethod]
-        public void TestMethod1()
+        public void DefaultPersonalDatas()
         {
-            value++; // 1
-            Assert.AreEqual(value, 1);
+            var runnings = _model.LoadPreviousRunnings();
+            Assert.AreEqual(runnings[0].PersonalInformation.Sex, Gender.Male);
+            Assert.AreEqual(runnings[0].PersonalInformation.Height, 170);
+            Assert.AreEqual(runnings[0].PersonalInformation.Weight, 70);
         }
 
-        [TestMethod]
-        public void TestMethod2()
-        {
-            value++; // 1
-            Assert.AreEqual(value, 1);
-        }
 
         [TestMethod]
-        public void TestMethod3()
+        public void CustomPersonalDatas()
         {
-            Assert.Fail();
+            var runnings = _model.LoadPreviousRunnings();
+            Assert.AreEqual(runnings[1].PersonalInformation.Sex, Gender.Female);
+            Assert.AreEqual(runnings[1].PersonalInformation.Height, 150);
+            Assert.AreEqual(runnings[1].PersonalInformation.Weight, 50);
         }
+
+
 
         #endregion
     }
