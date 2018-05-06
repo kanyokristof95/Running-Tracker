@@ -31,6 +31,12 @@ namespace UnitTest
             List<RunningData> testRunningData = new List<RunningData>();
             testRunningData.Add(new RunningData(new PersonalData()));
             testRunningData.Add(new RunningData(new PersonalData(Gender.Female, 150, 50)));
+
+            RunningData testData = new RunningData(new PersonalData());
+            testData.AddLocation(new LocationData(20, 10, 0, 100, 50, 40));
+            testData.AddLocation(new LocationData(100, 110, 0, 100, 50, 40));
+            testRunningData.Add(testData);
+
             _mock.Setup(mock => mock.LoadPreviousRunnings()).Returns(testRunningData);
 
             _model = new RunningTrackerModel(_mock.Object);
@@ -46,6 +52,10 @@ namespace UnitTest
             Assert.AreEqual(runnings[0].PersonalInformation.Sex, Gender.Male);
             Assert.AreEqual(runnings[0].PersonalInformation.Height, 170);
             Assert.AreEqual(runnings[0].PersonalInformation.Weight, 70);
+
+            Assert.AreEqual(runnings[0].Distance, 0);
+            Assert.IsTrue(runnings[0].Open);
+
         }
 
 
@@ -56,9 +66,24 @@ namespace UnitTest
             Assert.AreEqual(runnings[1].PersonalInformation.Sex, Gender.Female);
             Assert.AreEqual(runnings[1].PersonalInformation.Height, 150);
             Assert.AreEqual(runnings[1].PersonalInformation.Weight, 50);
+
+            Assert.AreEqual(runnings[1].Distance, 0);
+            Assert.IsTrue(runnings[1].Open);
         }
 
-
+        [TestMethod]
+        public void LocationTest()
+        {
+            var runnings = _model.LoadPreviousRunnings();
+            Assert.AreEqual(runnings[2].Distance, 200);
+            Assert.AreEqual(runnings[2].Up, 100);
+            Assert.AreEqual(runnings[2].Down, 80);
+            Assert.AreEqual(runnings[2].MinLatitude, 10);
+            Assert.AreEqual(runnings[2].MaxLatitude, 110);
+            Assert.AreEqual(runnings[2].MinLongitude, 20);
+            Assert.AreEqual(runnings[2].MaxLongitude, 100);
+            Assert.IsTrue(runnings[2].Open);
+        }
 
         #endregion
     }
