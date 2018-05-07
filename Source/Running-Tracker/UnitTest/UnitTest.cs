@@ -3,6 +3,9 @@ using Running_Tracker.Model;
 using Running_Tracker.Persistence;
 using Moq;
 using System.Collections.Generic;
+using Android.Locations;
+using System;
+
 
 namespace UnitTest
 {
@@ -40,6 +43,7 @@ namespace UnitTest
             _mock.Setup(mock => mock.LoadPreviousRunnings()).Returns(testRunningData);
 
             _model = new RunningTrackerModel(_mock.Object);
+
         }
         #endregion
 
@@ -84,6 +88,15 @@ namespace UnitTest
             Assert.AreEqual(runnings[2].MaxLongitude, 100);
             Assert.IsTrue(runnings[2].Open);
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(GpsNotReadyException))]
+        public void StartRunWithoutCalbrationTest()
+        {
+            _model.StartRunning();
+
+        }
+
 
         #endregion
     }
