@@ -6,11 +6,11 @@ using Android.App;
 // General Information about an assembly is controlled through the following 
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("Running_Tracker")]
+[assembly: AssemblyTitle("UnitTestApp")]
 [assembly: AssemblyDescription("")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("Running-Tracker")]
+[assembly: AssemblyProduct("UnitTestApp")]
 [assembly: AssemblyCopyright("Copyright ©  2018")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
@@ -28,8 +28,3 @@ using Android.App;
 // [assembly: AssemblyVersion("1.0.*")]
 [assembly: AssemblyVersion("1.0.0.0")]
 [assembly: AssemblyFileVersion("1.0.0.0")]
-[assembly: InternalsVisibleTo("Running-Tracker.Tests")]
-[assembly: InternalsVisibleTo("Running-Tracker.Explorables")]
-[assembly: InternalsVisibleTo("Running-Tracker.Tests1")]
-[assembly: InternalsVisibleTo("Running-Tracker.Tests2")]
-

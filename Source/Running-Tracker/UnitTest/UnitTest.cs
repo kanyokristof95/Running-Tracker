@@ -97,6 +97,20 @@ namespace UnitTest
 
         }
 
+        [TestMethod]
+        public void RunningData()
+        {
+            var runnings = _model.LoadPreviousRunnings();
+            Assert.AreEqual(runnings[2].Distance, 200);
+            Assert.AreEqual(runnings[2].Up, 100);
+            Assert.AreEqual(runnings[2].Down, 80);
+            Assert.AreEqual(runnings[2].MinLatitude, 10);
+            Assert.AreEqual(runnings[2].MaxLatitude, 110);
+            Assert.AreEqual(runnings[2].MinLongitude, 20);
+            Assert.AreEqual(runnings[2].MaxLongitude, 100);
+            Assert.IsTrue(runnings[2].Open);
+        }
+
 
         #endregion
     }
